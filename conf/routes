@@ -1,0 +1,10 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+GET     /                                     controllers.ApplicationController.index
+GET     /ping                                 controllers.ApplicationController.ping
+
+GET     /:pricer_id/format                    controllers.QuoteController.format(pricer_id)
+POST    /:pricer_id/quote                     controllers.QuoteController.quote(pricer_id)
+POST    /:pricer_id/quote/select              controllers.QuoteController.select(pricer_id)

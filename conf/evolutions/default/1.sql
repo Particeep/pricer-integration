@@ -1,0 +1,6 @@
+# Users schema
+
+# --- !Ups
+
+
+# --- !Downs
