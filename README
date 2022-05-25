@@ -1,11 +1,237 @@
 Pricer Integration
 ===========================================
 
-TODO
+# Intro
+
+The main goal of the application is to display insurance's offers and allow the user to select one of them.
+
+The application allow
+
+* to query insurance's webservice that return a price and some data about the insurance. We call this endpoint `quote`
+* to fulfill a contract with an insurer by providing data (name, address, etc...). We call this endpoint `select` because the end-user have selected an insurance
+
+# Setup dev environment
+
+## Requirment
+
+* Java 11
+* sbt 1.6.1
+
+## Setup
+
+You need to clone the repository
+
+```
+git clone https://...???
+```
+
+Then it's a standard sbt project
+
+```
+cd pricer-integration
+sbt clean update compile
+```
 
 
-* usage des dates : offsetdatetime
-* partie tech ET partie produit
+# Sbt Structure of the project
+
+The base application is a standard [Play](https://www.playframework.com/) application
+
+There are 3 sbt modules
+
+* 01-core is commons code that is available for conveniance. You will probably use StringUtils or DateUtils
+* 02-domain is the domain of the application. It define input and output type for the part you need to implement
+* 03-new-pricer : this is the module you need to implement
+
+# Your Goal
+
+The goal is to complete the module of `/modules/03-new_pricer` with code that implement the pricer you have been assigned
+
+Especially this parts that contains un-implemented method
+
+* InputFormatFactory.input_format_quote
+* InputFormatFactory.input_format_select
+* NewPricerService.quote
+* NewPricerService.select
+
+# InputFormat
+
+You need to implement 2 InputFormat
+
+* InputFormatFactory.input_format_quote
+* InputFormatFactory.input_format_select
+
+InputFormat is a schema that describes json in a way that suit our need.
+The building bloc are defined in the domain module
+
+* `input_format_quote` describe the json input of the `quote` endpoint
+* `input_format_select` describe the json input of the `select` endpoint, minus every fields that are already defined in `input_format_quote`
+
+## Basic structure
+
+```scala
+case class InputFormat(
+  // The name of the field, like the name of a field in an HTML form. It's the unique identifier of the field
+  name:             String,
+
+  // Type of the field : TEXT, DATE, NUMBER etc...
+  kind:             FieldType,
+
+  // Is the field required ?
+  mandatory:        Boolean,
+
+  // If kind == ENUM then this list the values that are allowed
+  options:          List[String]              = List(),
+
+  // Can we select multiple values
+  multiple:         Boolean                   = false,
+
+  // Is the field's value an array ?
+  is_array:         Boolean                   = false,
+
+  // If kind == OBJECT, we have a nested structure with sub-fields
+  fields:           Option[List[InputFormat]] = None,
+
+  // General tagging
+  tags:             Option[List[String]]      = None,
+
+  // Internal use, you don't need this
+  external_service: Option[ExternalService]   = None
+)
+```
+
+NB 1: if `is_array` is true then the json type is an array and items in the array are of type `kind`
+
+NB 2: if `is_array` is false and `multiple` is true then we are in the case where ???
+// TODO explain the case
+
+## Sample Code
+
+```scala
+  val insureds_format = {
+    InputFormat(
+      name      = "assures",
+      kind      = OBJECT,
+      mandatory = true,
+      is_array  = true,
+      fields    = Some(
+        List(
+          civility_format(),
+          firstname_format(),
+          lastname_format(),
+          birthdate_format(),
+          smoker_format()
+        )
+      )
+    )
+  }
+
+  private[this] def civility_format(): InputFormat = {
+    InputFormat(name = "civility", kind = ENUM, mandatory = true, options = Some(List("MR", "MME", "MISS")))
+  }
+
+  private[this] def firstname_format(): InputFormat = {
+    InputFormat(name = "firsst_name", kind = TEXT, mandatory = true)
+  }
+
+  private[this] def lastname_format(): InputFormat = {
+    InputFormat(name = "last_name", kind = TEXT, mandatory = true)
+  }
+
+  private[this] def birthdate_format(): InputFormat = {
+    InputFormat(name = "birthdate", kind = DATE, mandatory = true)
+  }
+
+  private[this] def smoker_format(): InputFormat = {
+    InputFormat(name = "is_smoking", kind = BOOLEAN, mandatory = false)
+  }
+```
+
+# Quote endpoint
+
+You should implement the method in `NewPricerService.quote`
+
+```scala
+private[newpricer] def quote(
+    request: NewPricerRequest,
+    config:  NewPricerConfig
+  ): Future[Fail \/ PricerResponse] = {
+    ???
+  }
+```
+
+## Inpout
+
+The input type `NewPricerRequest` and `NewPricerConfig` should be defined by you according to the requirement of the webservice you're working on.
+They should reflect the input format you define
+
+## Output
+
+* `\/` is the [scalaz disjunction](https://eed3si9n.com/learning-scalaz/Either.html), it works almost like the standard `Either`
+* `Fail` is an error type, defined in the project. It's a wrapper on a String and a stacktrace.
+* PricerResponse is defined in the project
+  * // TODO : describe the type
+
+// TODO product : describe what we need in ItemOffer, based on the product doc
+
+# Select endpoint
 
 
-* Example d'appel
+You should implement the method in `NewPricerService.select`
+
+```scala
+private[newpricer] def select(
+    request:        NewPricerRequest,
+    config:         NewPricerConfig,
+    selected_quote: Quote
+  ): Future[Fail \/ Quote] = {
+    ???
+  }
+```
+
+// TODO describe the Input and Output
+
+# Fail and ?|
+
+## Fail
+
+// TODO : describe usage
+
+## ?|
+
+// TODO : describe usage
+
+# General rules
+
+## Renaming
+
+rename new_pricer with the real name of the pricer you will work on
+
+Ex: you work on a home insurance for Axa
+You should do this kins of renaming
+
+* `03-new_prier` -> `03-axa`
+* `package newpricer.xxx` -> `package axa.home.xxx`
+* `NewPricer` in class / function name would become `AxaHome`
+
+# Coding standard
+
+* no `var`, no `null`
+* do not add library without consulting us first
+* use [OffsetDateTime](https://docs.oracle.com/javase/8/docs/api/java/time/OffsetDateTime.html) for date
+* don't throw exception : use `Fail \/ A` to catch error
+* do catch error in `Fail \/ A`
+* be non-blocking : never do blocking in the main execution context or in the play's execution context cf. [play's doc](https://www.playframework.com/documentation/2.8.x/ThreadPools)
+
+# Use case Rest / Json
+
+// TODO : How we handle Rest / Json, hint with WsClient
+
+# Use case SOAP
+
+// TODO : How we handle SOAP
+
+
+# Testing
+
+// TODO : which part you should test

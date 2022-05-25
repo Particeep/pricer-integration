@@ -21,7 +21,7 @@ class NewPricer @Inject() (
     with NewPricerJsonParser {
 
   def input_format(pricer_id: String): List[InputFormat] = {
-    InputFormatFactory.input_format
+    InputFormatFactory.input_format_quote
   }
 
   def quote(broker_config: Option[JsValue])(
@@ -37,6 +37,10 @@ class NewPricer @Inject() (
     } yield {
       result
     }
+  }
+
+  def input_format_select(pricer_id: String): List[InputFormat] = {
+    InputFormatFactory.input_format_select
   }
 
   def select(broker_config: Option[JsValue])(

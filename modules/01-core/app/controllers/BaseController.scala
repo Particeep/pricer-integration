@@ -21,8 +21,7 @@ trait BaseController
 
   override protected def failToResult(request: RequestHeader)(fail: Fail): Result = {
     fail match {
-      case fail: FailWithErrorDetail => fail.withResult(BadRequest)(request2lang(request))
-      case fail: Fail                => BadRequest(fail2json(fail)(request2lang(request)))
+      case fail: Fail => BadRequest(fail2json(fail)(request2lang(request)))
     }
   }
 
@@ -51,8 +50,7 @@ trait BaseController
   }
 
   protected def redirect(call: Call)(fail: Fail)(implicit req: Request[_]): Result = fail match {
-    case fail: FailWithErrorDetail => fail.withResult(Redirect(call))
-    case fail                      => Redirect(call).flashing("error" -> formatFailMessage(fail).mkString(" "))
+    case fail => Redirect(call).flashing("error" -> formatFailMessage(fail).mkString(" "))
   }
 
   implicit def request2lang(implicit request: RequestHeader): Lang = {

@@ -54,16 +54,14 @@ trait SorusEnhanced extends Sorus {
 
 trait StepOpsEnhanced[A, B] extends StepOps[A, B] {
   override def ?|(failureThunk: => String): Step[A] = orFailWith {
-    case err: Throwable   => new Fail(failureThunk).withEx(err)
-    case fail: Fail       => new Fail(failureThunk).withEx(fail)
-    case err: ErrorResult => ErrorHandler.errorResult2Fail(err)
-    case b                => new Fail(b.toString).withEx(failureThunk)
+    case err: Throwable => new Fail(failureThunk).withEx(err)
+    case fail: Fail     => new Fail(failureThunk).withEx(fail)
+    case b              => new Fail(b.toString).withEx(failureThunk)
   }
 
   override def ?|(empty: Unit): Step[A] = orFailWith {
-    case err: Throwable   => new Fail("Unexpected exception").withEx(err)
-    case fail: Fail       => fail
-    case err: ErrorResult => ErrorHandler.errorResult2Fail(err)
-    case b                => new Fail(b.toString)
+    case err: Throwable => new Fail("Unexpected exception").withEx(err)
+    case fail: Fail     => fail
+    case b              => new Fail(b.toString)
   }
 }

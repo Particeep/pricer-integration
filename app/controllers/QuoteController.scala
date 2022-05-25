@@ -18,10 +18,9 @@ class QuoteController @Inject() (
   pricer_factory:    PricerFactory
 )(implicit val ec:   ExecutionContext)
   extends BaseController
-    with Security
     with JsonParser {
 
-  def format(pricer_id: String): Action[AnyContent] = SecureAction.sorus { _ =>
+  def format(pricer_id: String): Action[AnyContent] = Action.sorus { _ =>
     for {
       pricer <- pricer_factory.build(pricer_id) ?| ()
     } yield {
@@ -29,25 +28,31 @@ class QuoteController @Inject() (
     }
   }
 
-  def quote(pricer_id: String): Action[JsValue] = BrokerAction.sorus(parse.json) { implicit request =>
+  def quote(pricer_id: String): Action[JsValue] = Action.sorus(parse.json) { implicit request =>
     val input = QuoteInput(request.body)
     val lang  = request.headers.get("lang").getOrElse("fr")
     for {
-      pricer <- pricer_factory.build(pricer_id)                     ?| ()
-      result <- pricer.quote(request.broker_auth)(pricer_id, input) ?| ()
+      pricer <- pricer_factory.build(pricer_id)               ?| ()
+      result <- pricer.quote(broker_config)(pricer_id, input) ?| ()
     } yield {
       val translated_result = result.translate()(Lang(lang))
       Ok(Json.toJson(translated_result))
     }
   }
 
-  def select(pricer_id: String): Action[JsValue] = BrokerAction.sorus(parse.json) { implicit request =>
+  def select(pricer_id: String): Action[JsValue] = Action.sorus(parse.json) { implicit request =>
     for {
-      input  <- request.body.validate[SelectSubscriptionInput]       ?| ()
-      pricer <- pricer_factory.build(pricer_id)                      ?| ()
-      result <- pricer.select(request.broker_auth)(pricer_id, input) ?| ()
+      input  <- request.body.validate[SelectSubscriptionInput] ?| ()
+      pricer <- pricer_factory.build(pricer_id)                ?| ()
+      result <- pricer.select(broker_config)(pricer_id, input) ?| ()
     } yield {
       Ok(Json.toJson(result))
     }
   }
+
+  /**
+   * This is custom json used to store broker configuration
+   * Like API key / secret
+   */
+  private[this] val broker_config = Some(Json.parse("""{}"""))
 }
