@@ -22,7 +22,7 @@ The application allow
 You need to clone the repository
 
 ```
-git clone https://...???
+git clone https://github.com/Particeep/pricer-integration.git
 ```
 
 Then it's a standard sbt project
@@ -39,9 +39,9 @@ The base application is a standard [Play](https://www.playframework.com/) applic
 
 There are 3 sbt modules
 
-* 01-core is commons code that is available for conveniance. You will probably use StringUtils or DateUtils
-* 02-domain is the domain of the application. It define input and output type for the part you need to implement
-* 03-new-pricer : this is the module you need to implement
+* `01-core` is commons code that is available for conveniance. You will probably use StringUtils or DateUtils
+* `02-domain` is the domain of the application. It define input and output type for the part you need to implement
+* `03-new-pricer` : this is the module you need to implement
 
 # Your Goal
 
@@ -49,17 +49,17 @@ The goal is to complete the module of `/modules/03-new_pricer` with code that im
 
 Especially this parts that contains un-implemented method
 
-* InputFormatFactory.input_format_quote
-* InputFormatFactory.input_format_select
-* NewPricerService.quote
-* NewPricerService.select
+* `InputFormatFactory.input_format_quote`
+* `InputFormatFactory.input_format_select`
+* `NewPricerService.quote`
+* `NewPricerService.select`
 
 # InputFormat
 
 You need to implement 2 InputFormat
 
-* InputFormatFactory.input_format_quote
-* InputFormatFactory.input_format_select
+* `InputFormatFactory.input_format_quote`
+* `InputFormatFactory.input_format_select`
 
 InputFormat is a schema that describes json in a way that suit our need.
 The building bloc are defined in the domain module
@@ -198,7 +198,7 @@ private[newpricer] def select(
 
 
 Sorus take inspiration from [Play Monadic Action](https://github.com/Driox/play-monadic-actions) to extends the DSL outside of Actions.
-It provides some syntactic sugar that allows boilerplate-free combination of "classical" type such as Future[Option[A]], Future[Either[A, B]], Future[A] using for-comprehensions. It also provide a simple and powerful way to handle error via Fail
+It provides some syntactic sugar that allows boilerplate-free combination of "classical" type such as `Future[Option[A]]`, `Future[Either[A, B]]`, `Future[A]` using for-comprehensions. It also provide a simple and powerful way to handle error via `Fail`
 
 This [article](https://medium.com/@adriencrovetto/130034b21b37) explain in greater detail the problem that this project addresses, and how to use the solution in your own projects.
 
@@ -206,7 +206,7 @@ This [article](https://medium.com/@adriencrovetto/130034b21b37) explain in great
 
 The DSL adds the `?|` operator to most of the types one could normally encounter (such as `Future[A]`, `Future[Option[A]]`, `Either[B,A]`, Future[Fail \/ A], etc...). The `?|` operator will transform the "error" part of the type to `Fail` (ie. None for Option, Left for Either, etc...) returning an `EitherT[Future, Fail, A]` (which is aliased to `Step[A]` for convenience)
 It enables the writing of the whole action as a single for-comprehension.
-Implicit convertion allows us to retrive a Future[Fail \/ A] as a result of the for-comprehension
+Implicit convertion allows us to retrive a `Future[Fail \/ A]` as a result of the for-comprehension
 
 ~~~scala
 package exemples
@@ -252,6 +252,9 @@ class BasicExemple extends Sorus {
 
 ~~~scala
 
+val exception:Throwable = ???
+val fail = Fail("Some error message").withEx(exception)
+
 val lastErrorMessage:String = fail.message
 
 val exception:Option[Throwable] = fail.getRootException()
@@ -259,6 +262,7 @@ val exception:Option[Throwable] = fail.getRootException()
 val allMessagesInOneString:String = fail.userMessage()
 
 ~~~
+
 
 # General rules
 
@@ -279,8 +283,16 @@ You should do this kins of renaming
 * do not add library without consulting us first
 * use [OffsetDateTime](https://docs.oracle.com/javase/8/docs/api/java/time/OffsetDateTime.html) for date
 * don't throw exception : use `Fail \/ A` to catch error
-* do catch error in `Fail \/ A`
 * be non-blocking : never do blocking in the main execution context or in the play's execution context cf. [play's doc](https://www.playframework.com/documentation/2.8.x/ThreadPools)
+* run `sbt scalastyle` and clean warning
+* run `sbt fmt` and clean warning
+* clean compilation error and warning
+
+
+# Testing
+
+// TODO : which part you should test
+
 
 # Use case Rest / Json
 
@@ -288,9 +300,4 @@ You should do this kins of renaming
 
 # Use case SOAP
 
-// TODO : How we handle SOAP
-
-
-# Testing
-
-// TODO : which part you should test
+// TODO : How we handle SOAP, hint JAXB vs Manual xml
