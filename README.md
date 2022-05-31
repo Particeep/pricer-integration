@@ -16,22 +16,23 @@ The application allow
 
 * Java 11
 * sbt 1.6.1
+* scala 2.13.8
 
 ## Setup
 
-You need to clone the repository
-
+You need to clone the repository. With https method you need a PAT (Personal Access Token)
 ```
 git clone https://github.com/Particeep/pricer-integration.git
 ```
-
+You can clone the repository with ssh method but you need to create key
+```
+git clone git@github.com:Particeep/pricer-integration.git
+```
 Then it's a standard sbt project
-
 ```
 cd pricer-integration
 sbt clean update compile
 ```
-
 
 # Sbt Structure of the project
 
@@ -39,7 +40,7 @@ The base application is a standard [Play](https://www.playframework.com/) applic
 
 There are 3 sbt modules
 
-* `01-core` is commons code that is available for conveniance. You will probably use StringUtils or DateUtils
+* `01-core` is commons code that is available for conveniance. You will probably use StringUtils or DateUtils --> Je pense qu'on n'a pas besoin de tout exposer pour le moment. Seulement les classes les plus importantes
 * `02-domain` is the domain of the application. It define input and output type for the part you need to implement
 * `03-new-pricer` : this is the module you need to implement
 
@@ -126,23 +127,23 @@ NB 2: if `is_array` is false and `multiple` is true then we are in the case wher
     )
   }
 
-  private[this] def civility_format(): InputFormat = {
+  private[this] def civility_format: InputFormat = {
     InputFormat(name = "civility", kind = ENUM, mandatory = true, options = Some(List("MR", "MME", "MISS")))
   }
 
-  private[this] def firstname_format(): InputFormat = {
+  private[this] def firstname_format: InputFormat = {
     InputFormat(name = "firsst_name", kind = TEXT, mandatory = true)
   }
 
-  private[this] def lastname_format(): InputFormat = {
+  private[this] def lastname_format: InputFormat = {
     InputFormat(name = "last_name", kind = TEXT, mandatory = true)
   }
 
-  private[this] def birthdate_format(): InputFormat = {
+  private[this] def birthdate_format: InputFormat = {
     InputFormat(name = "birthdate", kind = DATE, mandatory = true)
   }
 
-  private[this] def smoker_format(): InputFormat = {
+  private[this] def smoker_format: InputFormat = {
     InputFormat(name = "is_smoking", kind = BOOLEAN, mandatory = false)
   }
 ```
@@ -160,10 +161,13 @@ private[newpricer] def quote(
   }
 ```
 
-## Inpout
+## Input
 
 The input type `NewPricerRequest` and `NewPricerConfig` should be defined by you according to the requirement of the webservice you're working on.
-They should reflect the input format you define
+They should reflect the input format you define.
+
+You should document what difficulty did you encounter during developpement and what did you do. For instance if a pricer have a wsdl but it is too old for play, you have to explain that and
+explain what did you do to resolv this problem.
 
 ## Output
 

@@ -28,10 +28,11 @@ class NewPricer @Inject() (
     pricer_id:             String,
     quote_input:           QuoteInput
   ): Future[Fail \/ PricerResponse] = {
-    logger.info(s"[NeolianePricer] [quote] The pricer request is  ${Json.prettyPrint(quote_input.input_json)}")
+    logger.info(s"[newPricer] [quote] The pricer request is  ${(quote_input.input_json)}")
     for {
       pricer_request <- quote_input.input_json.validate[NewPricerRequest] ?| ()
-      auth           <- broker_config                                     ?| "error.broker.login.required"
+      auth           <- broker_config                                     ?| "error.broker.login.required" // defined in I18n
+      //auth           <- broker_config                                     ?| "broker config is empty for pricer newPricer" // error custom
       broker_config  <- auth.validate[NewPricerConfig]                    ?| ()
       result         <- service.quote(pricer_request, broker_config)      ?| ()
     } yield {
