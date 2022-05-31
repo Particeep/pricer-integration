@@ -1,20 +1,22 @@
-/.idea
+#  IDE (intellij, eclipse, Intellij, visual studio)
+.idea
 /.idea_modules
+.bsp
+.vscode/
+eclipse
+.project
+
+# files created during execution or compilation
 logs
 project/project
 project/target
 target
 .target
-tmp
-.history
 dist
-/.idea
 /*.iml
 /out
-/.idea_modules
 /.classpath
 /.project
-/RUNNING_PID
 /.settings
 .cache
 .class
@@ -22,18 +24,13 @@ bin
 .*.lock
 precompiled
 classes
-eclipse
-.project
 .classpath
 test-result
-activator*
-node_modules
-npm-debug.log
-.DS_Store
-/public/react
+
+# metals
 .metals/
 .bloop/
-.vscode/
-.ammonite/
 project/metals.sbt
-.bsp
+
+
+.ammonite/

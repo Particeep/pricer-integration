@@ -15,8 +15,6 @@ trait PricerService {
     quote_input:           QuoteInput
   ): Future[Fail \/ PricerResponse]
 
-  def input_format_select(pricer_id: String): List[InputFormat]
-
   def select(broker_config: Option[JsValue])(
     pricer_id:              String,
     subscription_input:     SelectSubscriptionInput
