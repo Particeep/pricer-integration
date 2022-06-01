@@ -15,9 +15,6 @@ pipeline {
     jdk    "JDK_11"
   }
   stages {
-    stage('PreBuild'){
-      steps { githubNotify(buildState: 'PENDING') }
-    }
     stage('Scala Build') {
       steps {
         sh 'sbt clean update compile'
@@ -49,12 +46,6 @@ pipeline {
     }
   }
   post {
-    success {
-      githubNotify(buildState: 'SUCCESS')
-    }
-    failure {
-      githubNotify(buildState: 'FAILURE')
-    }
     always {
       recordIssues(
         tool: scala()
