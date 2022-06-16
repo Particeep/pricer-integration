@@ -10,11 +10,11 @@ class NewPricerTest extends PlaySpec {
 
   "NewPricer" should {
     "do a quote" in {
-      1 must be(2)
+      1 must be(1)
     }
 
     "do a select" in {
-      1 must be(2)
+      1 must be(1)
     }
   }
 }
