@@ -42,9 +42,9 @@ object TimeUtils extends Logging {
 
   def to_now_day(date: OffsetDateTime): String = {
     val month     = date.getMonth.getValue
-    val month_str = if(month < 10) s"0$month" else month.toString()
+    val month_str = if(month < 10) s"0$month" else month.toString
     val day       = date.getDayOfMonth
-    val day_str   = if(day < 10) s"0$day" else day.toString()
+    val day_str   = if(day < 10) s"0$day" else day.toString
     s"${date.getYear}-${month_str}-${day_str}"
   }
 

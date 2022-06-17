@@ -524,31 +524,33 @@ So the test can be
   }
 ~~~
 
-If you create method that transform data you have to write test. For instance, we have this object
+If you create method that transform data you have to write test. For instance, we have this object.
+Insurer want to get date into timestamps unix
+
 ~~~scala
 import java.time.OffsetDateTime
 
 private[new_pricer] object NewPricerUtils {
-  /**
-   * input  :  val date: java.time.OffsetDateTime = 2022-03-24T11:20:06.694312+01:00
-   * output :  val res0: String = 20220324
-   */
-  def format_date(date: OffsetDateTime): String = date.toLocalDate.toString.replace("-", "")
+  def to_timestamps_unix(date: OffsetDateTime): String = date.toInstant.getEpochSecond
 }
 ~~~
-We can consider that the pricer called "new pricer" want to receive date without any "-" and in local date format
-(that is to say with no hours).
 So you need to test this method. In directory test you have to write a new class called for instance "NewPricerMethodTest.scala" and the method with an expected result
 
 ~~~scala
 "NewPricer new vertical format_date method" should {
-  "succeed when formatting date" in {
-    val test_date = TimeUtils.parse("2022-03-24T11:20:06.694312+01:00")
-    test_date.exists(NewPricerUtils.format_date(_).equals("20220324")) must be(true)
+  "succeed whdata_nowen formatting date" in {
+    val date_test = OffsetDateTime.now(ZoneOffset.UTC).withNano(0)
+    val date_to_timestamp: Long = to_timestamps_unix(date_test)
+    
+   val  revert_date_test_to_offsetdatetime = new Date(date_to_timestamp * 1000).toInstant.atOffset(ZoneOffset.UTC)
+    
+    date_test.compareTo(date_to_offsetdatetime) must be(0)
   }
 }
 ~~~
 # Use case Rest / Json
+Doc for play json [here](https://www.playframework.com/documentation/2.8.x/ScalaJson)
+
 With scala, it is easier to manage json data. You have to define in the companion object a format.
 For instance :
 
@@ -579,14 +581,7 @@ object Assures {
 
 ~~~
 
-After that, you just have to call the method `toJson` from Json
-
-~~~scala
-val assures = Assures(LADY, "dora", "the explorer", TimeUtils.now(), true)
-val data_to_json: Jsvalue = Json.toJson(Assures)
-~~~
-
-If you have to transform your data on Json and send it in the body for you request, this can be done easier (we are not sponsorised by Json)
+If you have to transform your data on Json and send it in the body for you request, this can be done easier.
 ~~~scala
 package new_pricer.services
 
@@ -619,14 +614,6 @@ First case, the easier, the insurer give you a WSDL, use sbt to compile it use i
 
 Second case, less easy, you can not use the wsdl (too old for play) or pricer does not give you that and you have to write manually the xml and call manually the api pricer.
 In this case you can use [XML confect](https://github.com/mthaler/xmlconfect).
-
-# Use case [Insert type of data you want]
-But sometimes you will need to improvise because most insurer is not modernised and you can have a surprise in how there api works.
-
-For instance, I can create a new part called "Use case PHP" because you can have insurer which demand to transform your data into php tab and send it to query param
-
-Overall, you need to create an object with method which do this kind of transformation.
-
 
 # Build sbt
 Do not forget to put your pricer in build sbt like for new_pricer.

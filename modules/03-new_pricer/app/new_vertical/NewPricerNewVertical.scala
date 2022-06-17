@@ -34,7 +34,6 @@ class NewPricerNewVertical @Inject() (
     for {
       pricer_request <- quote_input.input_json.validate[NewPricerRequest] ?| ()
       auth           <- broker_config                                     ?| "error.broker.login.required" // defined in I18n in the directory newpricer
-      auth_2         <- broker_config                                     ?| "broker config is empty for pricer newPricer" // other manner to write error
       broker_config  <- auth.validate[NewPricerConfig]                    ?| ()
       result         <- service.quote(pricer_request, broker_config)      ?| ()
     } yield {
