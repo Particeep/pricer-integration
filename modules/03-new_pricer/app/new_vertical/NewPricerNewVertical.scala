@@ -23,9 +23,6 @@ class NewPricerNewVertical @Inject() (
     InputFormatFactoryNewPricerNewVertical.input_format
   }
 
-  /**
-   * Replace with your value, that is just an example
-   */
   def quote(broker_config: Option[JsValue])(
     pricer_id:             String,
     quote_input:           QuoteInput
@@ -41,22 +38,20 @@ class NewPricerNewVertical @Inject() (
     }
   }
 
-  /**
-   * Replace with your value, that is just an example
-   */
   def select(broker_config: Option[JsValue])(
     pricer_id:              String,
     subscription_input:     SelectSubscriptionInput
   ): Future[Fail \/ SelectSubscriptionOutput] = {
+    logger.info(s"[newPricer] [select] The pricer request is  ${(subscription_input.data)}")
     for {
       pricer_request <- subscription_input.data.validate[NewPricerRequest] ?| ()
-      select_data    <- pricer_request.select_data                         ?| "select data for new pricer newvertical is empty !"
+      select_data    <- pricer_request.select_data                         ?| "select data for new_pricer new_vertical is empty"
       auth           <- broker_config                                      ?| "error.broker.login.required"
       broker_config  <- auth.validate[NewPricerConfig]                     ?| ()
       updated_quote  <- service.select(
                           pricer_request,
                           broker_config,
-                          select_data // put select directly avoid to carry option during  service part
+                          select_data // put select data directly avoid to carry option during  service part
                         ) ?| ()
     } yield {
       SelectSubscriptionOutput("200", updated_quote)

@@ -1,10 +1,9 @@
-package new_pricer.new_vertical
+package example.new_vertical
 
 import helpers.sorus.Fail
 import scalaz.{ -\/, \/, \/- }
 
 /**
- * THIS IS AN EXAMPLE, REPLACE WITH YOUR VALUE IF NEEDED.
  * This object check some fields with constraint asked by insured API.
  * Sometimes insurer will hide (literally) some constraint.
  *
@@ -12,10 +11,10 @@ import scalaz.{ -\/, \/, \/- }
  * a list of possible value, this is a business requirement and you can manage that with enumeration.
  * See package enumeration to know more.
  */
-private[new_pricer] object NewPricerNewVerticalBusinessRequirement {
+private[example] object ExampleNewVerticalBusinessRequirement {
 
   private[this] val fail: String => -\/[Fail] =
-    (message: String) => -\/(Fail(s"[NewPricerNewVertical]’[check business requirement] error: $message"))
+    (message: String) => -\/(Fail(s"[ExampleNewVertical]’[check business requirement] error: $message"))
 
   private[this] val success: \/-[Unit]        = \/-(())
 
@@ -45,6 +44,6 @@ private[new_pricer] object NewPricerNewVerticalBusinessRequirement {
             s"insee is not modulo 9 AND length is not between 12 and 24.  Value : $value and length $value_length"
           )
       }
-    } else { fail(s"insee value is negative ! Value : $value") }
+    } else { fail(s"insee value is negative. : Value : $value") }
   }
 }

@@ -29,18 +29,24 @@ lazy val new_pricer: Project = (project in file("modules/03-new_pricer")).enable
   .settings(commonPlaySettings: _*)
   .dependsOn(core % "test->test;compile->compile", domain)
 
+lazy val example: Project    = (project in file("modules/04-example")).enablePlugins(PlayScala)
+  .settings(commonPlaySettings: _*)
+  .dependsOn(core % "test->test;compile->compile", domain)
+
 lazy val root: Project       = (project in file("."))
   .enablePlugins(PlayScala)
   .settings(commonPlaySettings: _*)
   .aggregate(
     core,
     domain,
-    new_pricer
+    new_pricer,
+    example
   )
   .dependsOn(
     core % "test->test;compile->compile",
     domain,
-    new_pricer
+    new_pricer,
+    example
   )
 
 lazy val deps_common = Seq(

@@ -1,14 +1,14 @@
-package new_vertical.models.enumeration
+package example.new_vertical.models.enumeration
 
 import helpers.{ Enum, EnumHelper }
 
 /**
- * This is import to keep this structure
+ * This is important to keep this structure
  * for more information : https://nrinaudo.github.io/scala-best-practices/adts/
  */
-sealed trait DriverLicence extends Product with Serializable with Enum
+private[example] sealed trait DriverLicence extends Product with Serializable with Enum
 
-object DriverLicence extends EnumHelper[DriverLicence] {
+private[example] object DriverLicence extends EnumHelper[DriverLicence] {
   final case object TYPE_A        extends DriverLicence { def label(): String = "Permis A"           }
   final case object TYPE_B        extends DriverLicence { def label(): String = "Permis B"           }
   final case object TRUNK_LICENCE extends DriverLicence { def label(): String = "Permis poids lourd" }

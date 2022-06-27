@@ -17,8 +17,6 @@ The application allow
 * Java 11
 * sbt 1.6.1
 * scala 2.13.8
-* An IDE like visual studio, IntelliJ etc.. Use what you want
-* postman or insomnia or whatever to test your request if needed
 
 ## Setup
 
@@ -30,7 +28,6 @@ You can clone the repository with ssh method, but you need to create key
 ```
 git clone git@github.com:Particeep/pricer-integration.git
 ```
-no matter what you choose, you have to configure your github account.
 
 Then it's a standard sbt project
 ```
@@ -46,8 +43,8 @@ There are 3 sbt modules
 
 * `01-core` is commons code that is available for convenience. You will probably use StringUtils or DateUtils
 * `02-domain` is the domain of the application. It defines input and output type for the part you need to implement
-* `03-new-pricer` : this is the module you need to implement. This module contains an example in order you to understand the structure,
-but you have to delete all of it and replace by your code.
+* `03-new-pricer` : this is the module you need to implement.
+* `04-new-pricer` an example in order to understand in order you to understand the structure.
 
 # Your Goal
 
@@ -172,7 +169,7 @@ The input type `NewPricerRequest` and `NewPricerConfig` should be defined by you
 They should reflect the input format you define.
 
 You should document what difficulty did you encounter during developpement and what did you do. For instance if a pricer have a wsdl but it is too old for play, you have to explain that and
-explain what did you do to resolv this problem.
+explain what did you do to resolve this problem.
 
 ## Output
 
@@ -180,10 +177,12 @@ explain what did you do to resolv this problem.
 * `Fail` is an error type, defined in the project. It's a wrapper on a String and a stacktrace.
 
 ### PricerResponse 
+
 This is the type that you have to return to the method quote. There is many class for this object, and we will see each of them. 
 But to resume, eiher your code return a price given by insurer with extra data specified in the doc or by us or you return an error divised in two types. 
 
 #### PricerError
+
 ```scala
 case class PricerError(message: String, args: List[String] = List.empty) extends PricerResponse
 ```
@@ -204,6 +203,7 @@ That implied you made a mistake in the code, and you have to correct it.
 Insurer API can send respond in english or in french. You don't have to translate them.
 
 #### Decline
+
 ```scala
 case class Decline(url: URL, meta: Option[Meta] = None) extends PricerResponse
 ```
@@ -215,7 +215,7 @@ There are no offer for you in our database accoring to your profile : you did to
 ```
 As you can see, there is the type `Meta` and `URL`.
 
-`URL` is ignored when we don't ask you to put an url on this type, you can put an empty text like :
+`URL` is rarely use, put an empty string only if we do not say what to put in the spec :
 ```scala
 val url : URL = URL("")
 ```
@@ -250,6 +250,7 @@ val meta : Meta = Meta(title = "new_pricer.title.decline".some, description = "n
 ```
 
 #### Offer
+
 ```scala
 case class Offer(
                   price:         Price,
@@ -263,6 +264,7 @@ The type `Offer` is use when insurer API give you a price. So this is the positi
 Overall, you have to put data according to what we demand. You will have to put :
 
 ##### Price
+
 ```scala
 case class Price(
                   amount_ht:   Amount,
@@ -279,7 +281,8 @@ case class Amount(value: Int)
 ```
 You have to convert your price into `Int`, but you have two restrictions : 
 - first, you don't have to use `toInt` directly because we work with type `BigDecimal`.
-- second, take always two numbers after comma. You can use this already defined in `PricerBaseCalculator`:
+- second, take always two numbers after comma because all monetary amounts are in cents. 
+You can use this already defined in `PricerBaseCalculator`:
 ```scala
  def amountFromDoubleToCentime(amount: Double): Int =
   (BigDecimal(amount) * BigDecimal(100)).setScale(2, BigDecimal.RoundingMode.HALF_UP).toInt
@@ -320,12 +323,13 @@ And the price that insurer API give you, is 12€. So you need to feed your type
 ```scala
 val price : Price = 
   Price(
-    amount_ht= Amount(12),
+    amount_ht= Amount(1200),
     taxes = Amount(NumberUtils.amountFromDoubleToCentime(1337.21)),
     broker_fees = Amount(234)
   )
 ```
 ##### OfferItem
+
 ```scala
 case class OfferItem(label: String, value: String, kind: String, args: List[String] = List.empty)
 ```
@@ -349,19 +353,20 @@ val offer_item = OfferItem(label = "message_with_custom_things", kind = "text" ,
 Now get back to type `Offer` 
 
 ##### external_data
+
 External is data that you need in order to complete select part. You are free to decide JSON structure.
 If during the select insurer return you a link, you have to create an external_data.
 
 ##### InternalData
+
 // TODO : I have no idea what it is --> need help for that
 
 ##### PaymentData
-// TODO : I have no idea what it is --> need help for that
 
-##### InternalData
 // TODO : I have no idea what it is --> need help for that
 
 # Select endpoint
+
 You should implement the method in `NewPricerService.select`
 
 ```scala
@@ -374,17 +379,21 @@ private[newpricer] def select(
   }
 ```
 ## Input
+
 This method take in input new data to send in select part. Depending on insurer you have to send again data quote but in another endpoint, 
 and with that new data like name, first name, phone number etc..
 
 ## Output
+
 Depending on insurer you can have many cases : 
 - what you send is data for user sign up, so you don't have to in more
 - insurance send you back (so after you send to it data) a link in order to allow user to continue the process on the insurance site and in this case you have to put
 the link in external data
 
 # Fail and ?|
+
 ## ?| aka Sorus
+
 Sorus take inspiration from [Play Monadic Action](https://github.com/Driox/play-monadic-actions) to extends the DSL outside of Actions.
 It provides some syntactic sugar that allows boilerplate-free combination of "classical" type such as `Future[Option[A]]`, `Future[Either[A, B]]`, `Future[A]` using for-comprehensions. It also provide a simple and powerful way to handle error via `Fail`
 
@@ -409,7 +418,7 @@ class BasicExemple extends Sorus {
   // Sample User class
   final case class User(id:Option[Long], email:String, validate:Boolean)
 
-  private[this] def do_something(): Future[Fail \/ User] = {
+  def do_something(): Future[Fail \/ User] = {
     for {
       user <- load_User(12L)       ?| "Error while loading user"     // <- you don't create Fail yourself but the ?| operator do it for you
       _    <- user.validate       ?| "Account need to be validated"
@@ -419,12 +428,12 @@ class BasicExemple extends Sorus {
     }
   }
 
-  private[this] def load_user(id:Long):Future[Option[User]] = {
+  def load_user(id:Long):Future[Option[User]] = {
     // Load it from DB / API / Services ...
     Future.successful(Some(User(Some(id), "foo@bar.com", false)))
   }
 
-  private[this] def log_user_action(user:User):Future[Fail \/ Unit] = {
+  def log_user_action(user:User):Future[Fail \/ Unit] = {
     for {
       id <- user.id ?| "Can't log action of user wihtout id"
     } yield {
@@ -469,6 +478,7 @@ You should do this kins of renaming
 * `NewPricer` in class / function name would become `AxaHome`
 
 # Coding standard
+
 * no `var`, no `null`
 * do not add library without consulting us first
 * use [OffsetDateTime](https://docs.oracle.com/javase/8/docs/api/java/time/OffsetDateTime.html) for date
@@ -480,14 +490,17 @@ You should do this kins of renaming
 * code in type level and respect functional programming (no side effect, use monad etc..)
 * encapsulate each of your class in private[new_pricer] except for the three methods implemented by `PricerService`
 * We use generally private[this] in the front of a val or def.
-
+* run `sbt scalastyle` and clean warning
+* run `sbt fmt`
 
 # error management and log
+
 - All technical error must be contained on a Fail.
 - All business error must be contained on a `PricerError` (when it is possible).
-- user logger only it is important, when received data in input and output. Fail will be automatically logged.
+- use logger.info only if it is important that is to say when received data in input and output.
 
 # Testing
+
 It is important to test what you did. The main aims is to test program behavior
 
 You will have to test many cases :
@@ -495,6 +508,10 @@ You will have to test many cases :
 - test case when your select is ok
 - test case when pricer return technical error
 - test case when pricer return business error
+
+You do not need to test library you use 
+(for instance do not create a test which examine if ws client send data, format json from jsonx.formatCaseClass).
+Again You do not need to re test your tools, test only what you created.
 
 When you have to test quote part, do not write a test which compare a price in the code with what api insurer give you.
 Because an insurer does not have fix price it can change when he wants. You can compare then the AST that you have defined
@@ -504,7 +521,7 @@ For instance, we can consider this AST
 ~~~scala
 sealed trait NewPricerNewResponse
 
-final case class NewPricePrice(value : Double) extends NewPricerNewResponse
+final case class NewPricerPrice(value : Double) extends NewPricerNewResponse
 final case class NewPricerError(code_error : Int, reason  : String) extends NewPricerNewResponse
 ~~~
 
@@ -516,7 +533,7 @@ So the test can be
     val result      = await(new_pricer_service.get_price(data, config, TypeOfFormula.BASIC))
 
     (result match {
-      case \/-(NewPricePrice(_))       => true
+      case \/-(NewPricerPrice(_))       => true
       case not_expected                => 
         logger.error(s"Error during get price -> $not_expected")
         false
@@ -549,6 +566,7 @@ So you need to test this method. In directory test you have to write a new class
 }
 ~~~
 # Use case Rest / Json
+
 Doc for play json [here](https://www.playframework.com/documentation/2.8.x/ScalaJson)
 
 With scala, it is easier to manage json data. You have to define in the companion object a format.
@@ -608,6 +626,7 @@ private[new_pricer] final class NewPricerService @Inject() (val ws: WSClient, va
 }
 ~~~
 # Use case SOAP
+
 They are two way to handle SOAP and it depends on the insurer.
 
 First case, the easier, the insurer give you a WSDL, use sbt to compile it use it methods to construct the data and send them to the api pricer.
@@ -616,4 +635,5 @@ Second case, less easy, you can not use the wsdl (too old for play) or pricer do
 In this case you can use [XML confect](https://github.com/mthaler/xmlconfect).
 
 # Build sbt
+ 
 Do not forget to put your pricer in build sbt like for new_pricer.
