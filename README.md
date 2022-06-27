@@ -44,7 +44,7 @@ There are 3 sbt modules
 * `01-core` is commons code that is available for convenience. You will probably use StringUtils or DateUtils
 * `02-domain` is the domain of the application. It defines input and output type for the part you need to implement
 * `03-new-pricer` : this is the module you need to implement.
-* `04-new-pricer` an example in order to understand in order you to understand the structure.
+* `04-example` an example in order to understand the structure.
 
 # Your Goal
 
@@ -57,6 +57,11 @@ Especially this parts that contains un-implemented method
 * `InputFormatFactory.input_format_select`
 * `NewPricerService.quote`
 * `NewPricerService.select`
+
+And un-implemented case class 
+* QuoteData
+* SelectData
+* NewPricerConfig
 
 # InputFormat
 
@@ -168,7 +173,7 @@ private[new_pricer] def quote(
 The input type `NewPricerRequest` and `NewPricerConfig` should be defined by you according to the requirement of the webservice you're working on.
 They should reflect the input format you define.
 
-You should document what difficulty did you encounter during developpement and what did you do. For instance if a pricer have a wsdl but it is too old for play, you have to explain that and
+You should document what difficulty you faced during developpement and what did you do. For instance if a pricer have a wsdl, but it is too old for play, you have to explain that and
 explain what did you do to resolve this problem.
 
 ## Output
@@ -629,9 +634,9 @@ private[new_pricer] final class NewPricerService @Inject() (val ws: WSClient, va
 
 They are two way to handle SOAP and it depends on the insurer.
 
-First case, the easier, the insurer give you a WSDL, use sbt to compile it use it methods to construct the data and send them to the api pricer.
+First case, the easier, the insurer give you a WSDL, use sbt to compile and use their methods to construct the data and send them to the api pricer.
 
-Second case, less easy, you can not use the wsdl (too old for play) or pricer does not give you that and you have to write manually the xml and call manually the api pricer.
+Second case, less easy, you can not use the wsdl (too old for play) or pricer does not give you that, and you have to write manually the xml and call manually the api pricer.
 In this case you can use [XML confect](https://github.com/mthaler/xmlconfect).
 
 # Build sbt
