@@ -44,12 +44,10 @@ There are 3 sbt modules
 * `01-core` is commons code that is available for convenience. You will probably use StringUtils or DateUtils
 * `02-domain` is the domain of the application. It defines input and output type for the part you need to implement
 * `03-new-pricer` : this is the module you need to implement.
-* `04-example` an example in order to understand the structure.
 
 # Your Goal
 
 The goal is to complete the module of `/modules/03-new_pricer` with code that implement the pricer you have been assigned.
-new_pricer contains example in order to guide you but you need to delete all comment or example code and replace by your implementation/
 
 Especially this parts that contains un-implemented method
 
