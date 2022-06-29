@@ -19,8 +19,12 @@ class NewPricerNewVertical @Inject() (
     with Sorus
     with Logging {
 
-  def input_format(pricer_id: String): List[InputFormat] = {
-    InputFormatFactoryNewPricerNewVertical.input_format
+  def input_quote_format(pricer_id: String): List[InputFormat] = {
+    InputFormatFactoryNewPricerNewVertical.input_format_quote
+  }
+
+  def input_select_format(pricer_id: String): List[InputFormat] = {
+    InputFormatFactoryNewPricerNewVertical.input_format_select
   }
 
   def quote(broker_config: Option[JsValue])(
