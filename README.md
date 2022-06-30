@@ -43,7 +43,7 @@ There are 3 sbt modules
 
 * `01-core` is commons code that is available for convenience. You will probably use StringUtils or DateUtils
 * `02-domain` is the domain of the application. It defines input and output type for the part you need to implement
-* `03-new-pricer` : this is the module you need to implement.
+* `03-new-pricer` is the module you need to implement.
 
 # Your Goal
 
@@ -51,10 +51,10 @@ The goal is to complete the module of `/modules/03-new_pricer` with code that im
 
 Especially this parts that contains un-implemented method
 
-* `InputFormatFactory.input_format_quote`
-* `InputFormatFactory.input_format_select`
-* `NewPricerService.quote`
-* `NewPricerService.select`
+* `InputFormatFactoryNewPricerNewVertical.input_format_quote`
+* `InputFormatFactoryNewPricerNewVertical.input_format_select`
+* `NewPricerNewVertical.quote`
+* `NewPricerNewVertical.select`
 
 And un-implemented case class 
 * QuoteData
@@ -65,8 +65,8 @@ And un-implemented case class
 
 You need to implement 2 InputFormat
 
-* `InputFormatFactory.input_format_quote`
-* `InputFormatFactory.input_format_select`
+* `InputFormatFactoryNewPricerNewVertical.input_format_quote`
+* `InputFormatFactoryNewPricerNewVertical.input_format_select`
 
 InputFormat is a schema that describes json in a way that suit our need.
 The building bloc are defined in the domain module
@@ -109,8 +109,7 @@ case class InputFormat(
 
 NB 1: if `is_array` is true then the json type is an array and items in the array are of type `kind`
 
-NB 2: if `is_array` is false and `multiple` is true then we are in the case where you have checkbox and field to check
-is defined by what you put in option.
+NB 2: if `is_array` is false and `multiple` is true then is the case where it create a checkbox, and fields  defined by data in attribute "option".
 
 ## Sample Code
 
@@ -156,7 +155,7 @@ is defined by what you put in option.
 
 # Quote endpoint
 
-You should implement the method in `NewPricerService.quote`. In the code you will have a dummy example.
+You have to implement the method in `NewPricerService.quote`.
 ```scala
 private[new_pricer] def quote(
     request: NewPricerRequest,
@@ -182,7 +181,7 @@ explain what did you do to resolve this problem.
 ### PricerResponse 
 
 This is the type that you have to return to the method quote. There is many class for this object, and we will see each of them. 
-But to resume, eiher your code return a price given by insurer with extra data specified in the doc or by us or you return an error divised in two types. 
+But to resume, either your code return a price given by insurer with extra data specified in the doc or by us, or you return an error divided in two types. 
 
 #### PricerError
 
@@ -190,27 +189,25 @@ But to resume, eiher your code return a price given by insurer with extra data s
 case class PricerError(message: String, args: List[String] = List.empty) extends PricerResponse
 ```
 
-
 `PricerError` is use when insurer API return a business error.
 A business error is an error which explicit the insurer refuse user because there is no coherence in the data.
 
 For instance driver age is inferior to 18. Another example you can not say you have a good vision but at the same time you are blind.
 
 Unfortunately, api insurer can make difficult how to separate technical problem from business problem. In this case you can return a sentence like "you are not eligible"
-and put on a fail what the api insured return.
-
+and put on a `Fail` what the api insured return.
 
 A technical problem is an error on data. For instance, they are missing data or data is not understood by the api insurer.
 That implied you made a mistake in the code, and you have to correct it.
 
-Insurer API can send respond in english or in french. You don't have to translate them.
+Insurer API can send respond in english or in French. You do not have to translate.
 
 #### Decline
 
 ```scala
 case class Decline(url: URL, meta: Option[Meta] = None) extends PricerResponse
 ```
-Decline is use when insurer API refuse to give you a price because your profile is not eligible. 
+`Decline` is use when insurer API refuse to give you a price because your profile is not eligible. 
 All data from user are good and consistent, but Insurer API does not want to insure this user profile.
 At this moment you have to put the reason and use this class. It can be for instance :
 ```
@@ -218,7 +215,7 @@ There are no offer for you in our database accoring to your profile : you did to
 ```
 As you can see, there is the type `Meta` and `URL`.
 
-`URL` is rarely use, put an empty string only if we do not say what to put in the spec :
+`URL` is rarely use, put an empty string only if we do not say what to put :
 ```scala
 val url : URL = URL("")
 ```
@@ -247,7 +244,7 @@ And in `message.fr.conf` we have this :
 new_pricer.title.decline = "Tarification refusée"
 new_pricer.title.description = "Vous n'êtes pas éligble."
 ````
-your `Decline` will be : 
+your `Meta` will be : 
 ```scala
 val meta : Meta = Meta(title = "new_pricer.title.decline".some, description = "new_pricer.title.description".some )
 ```
@@ -278,7 +275,7 @@ case class Price(
                   frequency:   Frequency = Frequency.ONCE
                 )
 ```
-For us, a price that insurer API give you is of type `Amount`.
+For us, a price that insurer API give you, is of type `Amount`.
 ```scala
 case class Amount(value: Int)
 ```
@@ -290,18 +287,17 @@ You can use this already defined in `PricerBaseCalculator`:
  def amountFromDoubleToCentime(amount: Double): Int =
   (BigDecimal(amount) * BigDecimal(100)).setScale(2, BigDecimal.RoundingMode.HALF_UP).toInt
 ```
-if you have to do operation on price use object `PricerBaseCalculator` and do not hesitate to add new operation with `Int`, `double` or `Long` for your need in this object.
+if you have to do operation on price use object `PricerBaseCalculator` and do not hesitate to add new operation with `Int`, `double` or `Long` for your need.
 
 Example : 
-Imagine insurer API return a price and the price 123,34, you have to do :
+Imagine insurer API return a price and the price 123.34, you have to do :
 ```scala
 import utils.NumberUtils
-val result_request : Double = 123.34
-val amount : Amount = Amount(NumberUtils.amountFromDoubleToCentime(result_request)) // res0 : Amount(12334)
+val result_request : Double = 123.34 // res0 : 123.34
+val amount : Amount = Amount(NumberUtils.amountFromDoubleToCentime(result_request)) // res1 : Amount(12334)
 ```
 Now we know what is `Amount`, we can return to the type `price`
 ```scala
-// I put here, don't need to scroll (don't thanks me)
 case class Price(
                   amount_ht:   Amount,
                   owner_fees:  Amount    = Amount(0),
@@ -324,27 +320,31 @@ broker_fees :  234€
 ```
 And the price that insurer API give you, is 12€. So you need to feed your type price like that
 ```scala
-val price : Price = 
-  Price(
-    amount_ht= Amount(1200),
-    taxes = Amount(NumberUtils.amountFromDoubleToCentime(1337.21)),
+val price : Price = Price(
+    amount_ht   = Amount(1200),
+    taxes       = Amount(NumberUtils.amountFromDoubleToCentime(1337.21)),
     broker_fees = Amount(234)
   )
 ```
 ##### OfferItem
 
 ```scala
-case class OfferItem(label: String, value: String, kind: String, args: List[String] = List.empty)
+case class OfferItem(
+                      label: String,
+                      value: String,
+                      kind: String,
+                      args: List[String] = List.empty
+                    )
 ```
 `OfferItem` is additional data which come with the price. What put in this is an information that we will give you if needed.
 
 Parameter kind is the type of your data which can be defined by us. 
 
-This case class is subject to I18n and like `Meta` so if needed, you have to define in message.en.newpricer.conf and 
+This case class is subject to I18n and like `Meta` so if needed, you have to define in message.en.newpricer.conf and
 message.fr.newpricer.conf label and value.
 
-There are something new compared to `Meta` :  the parameter args. Indeed, you can create in message.en/fr.newpricer.conf
-a message with a symbol in order to be replaced. For instance in message.en.conf you can have : 
+There are something new compared to `Meta` :  the parameter args. Indeed, you can create in message.en.newpricer.conf and
+message.fr.newpricer.conf a message with a symbol in order to be replaced. For instance in message.en.conf you can have : 
 ```
 message_with_custom_things = "You have {0} in your wallet and {1} in your hand
 ```
@@ -354,10 +354,18 @@ val offer_item = OfferItem(label = "message_with_custom_things", kind = "text" ,
 // the message will be "You have pistol in your wallet and chewing-um in your hand"
 ```
 Now get back to type `Offer` 
-
+```scala
+case class Offer(
+                  price:         Price,
+                  detail:        List[OfferItem]      = List(),
+                  internal_data: Option[InternalData] = None,
+                  external_data: Option[JsObject]     = None,
+                  meta:          Option[Meta]         = None
+                ) extends PricerResponse
+```
 ##### external_data
 
-External is data that you need in order to complete select part. You are free to decide JSON structure.
+external_data is data that you need in order to complete select part. You are free to decide JSON structure.
 If during the select insurer return you a link, you have to create an external_data.
 
 ##### InternalData
@@ -397,16 +405,16 @@ the link in external data
 
 ## ?| aka Sorus
 
-Sorus take inspiration from [Play Monadic Action](https://github.com/Driox/play-monadic-actions) to extends the DSL outside of Actions.
-It provides some syntactic sugar that allows boilerplate-free combination of "classical" type such as `Future[Option[A]]`, `Future[Either[A, B]]`, `Future[A]` using for-comprehensions. It also provide a simple and powerful way to handle error via `Fail`
+Sorus take inspiration from [Play Monadic Action](https://github.com/Driox/play-monadic-actions) to extend the DSL outside of Actions.
+It provides some syntactic sugar that allows boilerplate-free combination of "classical" type such as `Future[Option[A]]`, `Future[Either[A, B]]`, `Future[A]` using for-comprehensions. It also provides a simple and powerful way to handle error via `Fail`
 
-This [article](https://medium.com/@adriencrovetto/130034b21b37) explain in greater detail the problem that this project addresses, and how to use the solution in your own projects.
+This [article](https://medium.com/@adriencrovetto/130034b21b37) explains in greater detail the problem that this project addresses, and how to use the solution in your own projects.
 
 ## Usage
 
 The DSL adds the `?|` operator to most of the types one could normally encounter (such as `Future[A]`, `Future[Option[A]]`, `Either[B,A]`, Future[Fail \/ A], etc...). The `?|` operator will transform the "error" part of the type to `Fail` (ie. None for Option, Left for Either, etc...) returning an `EitherT[Future, Fail, A]` (which is aliased to `Step[A]` for convenience)
 It enables the writing of the whole action as a single for-comprehension.
-Implicit convertion allows us to retrive a `Future[Fail \/ A]` as a result of the for-comprehension
+Implicit conversion allows us to retrieve a `Future[Fail \/ A]` as a result of the for-comprehension
 
 ~~~scala
 package exemples
@@ -471,10 +479,10 @@ val allMessagesInOneString:String = fail.userMessage()
 
 ## Renaming
 
-rename new_pricer with the real name of the pricer you will work on
+rename new_pricer and new_vertical with the real name of the pricer you will work on
 
-Ex: you work on a home insurance for Axa
-You should do this kins of renaming
+Ex: you work on a home insurance for Axa home
+You should do these kins of renaming
 
 * `03-new_prier` -> `03-axa`
 * `package newpricer.xxx` -> `package axa.home.xxx`
@@ -486,6 +494,7 @@ You should do this kins of renaming
 * do not add library without consulting us first
 * use [OffsetDateTime](https://docs.oracle.com/javase/8/docs/api/java/time/OffsetDateTime.html) for date
 * don't throw exception : use `Fail \/ A` to catch error
+* to use try/catch of Java
 * be non-blocking : never do blocking in the main execution context or in the play's execution context cf. [play's doc](https://www.playframework.com/documentation/2.8.x/ThreadPools)
 * clean compilation error and warning (it exists warning that you can't delete. Delete warning only present on your pricer integration.)
 * code must be written in snake_case
@@ -513,8 +522,8 @@ You will have to test many cases :
 - test case when pricer return business error
 
 You do not need to test library you use 
-(for instance do not create a test which examine if ws client send data, format json from jsonx.formatCaseClass).
-Again You do not need to re test your tools, test only what you created.
+(for instance do not create a test which examine if ws client send data or if format json from jsonx.formatCaseClass works).
+You do not need to re test your tools, test only what you created.
 
 When you have to test quote part, do not write a test which compare a price in the code with what api insurer give you.
 Because an insurer does not have fix price it can change when he wants. You can compare then the AST that you have defined
@@ -530,23 +539,23 @@ final case class NewPricerError(code_error : Int, reason  : String) extends NewP
 
 So the test can be 
 ~~~scala
+// https://www.scalatest.org/
 "NewPriceService test" should {
   "Success, because it return a price" in {
     val new_pricer_service = app.injector.instanceOf[NewPricerService]
-    val result      = await(new_pricer_service.get_price(data, config, TypeOfFormula.BASIC))
+    val result = await(new_pricer_service.get_price(data, config, TypeOfFormula.BASIC))
 
-    (result match {
-      case \/-(NewPricerPrice(_))       => true
-      case not_expected                => 
-        logger.error(s"Error during get price -> $not_expected")
-        false
-    }) must be(true)
+    // https://www.scalatest.org/user_guide/using_assertions
+    result match {
+      case \/-(NewPricerPrice(_)) => succeed
+      case not_expected => fail(s"Error during get price -> $not_expected")
+    }
   }
+}
 ~~~
 
-If you create method that transform data you have to write test. For instance, we have this object.
-Insurer want to get date into timestamps unix
-
+If you create method that transform data you have to write test. For instance, insurer want to get date into timestamps unix.
+So you have to create an object like this :
 ~~~scala
 import java.time.OffsetDateTime
 
@@ -554,11 +563,11 @@ private[new_pricer] object NewPricerUtils {
   def to_timestamps_unix(date: OffsetDateTime): String = date.toInstant.getEpochSecond
 }
 ~~~
-So you need to test this method. In directory test you have to write a new class called for instance "NewPricerMethodTest.scala" and the method with an expected result
+You need to test this method. In directory test you have to write a new class called for instance "NewPricerMethodTest.scala" and the method with an expected result
 
 ~~~scala
 "NewPricer new vertical format_date method" should {
-  "succeed whdata_nowen formatting date" in {
+  "succeed when formatting date" in {
     val date_test = OffsetDateTime.now(ZoneOffset.UTC).withNano(0)
     val date_to_timestamp: Long = to_timestamps_unix(date_test)
     
@@ -594,10 +603,9 @@ private[new_pricer] final case class Assures(
                                             )
 
 object Assures {
-  implicit val format: OFormat[Assures] =
-    Jsonx.formatCaseClass[
-      Assures
-    ] // this line is important, this is that which define for you json format for your class
+  // implicit is important
+  // this line is important, this is that which define for you json format for your class
+  implicit val format: OFormat[Assures] = Jsonx.formatCaseClass[Assures] 
 }
 
 ~~~
@@ -630,11 +638,11 @@ private[new_pricer] final class NewPricerService @Inject() (val ws: WSClient, va
 ~~~
 # Use case SOAP
 
-They are two way to handle SOAP and it depends on the insurer.
+They are two ways to handle SOAP, and it depends on the insurer.
 
 First case, the easier, the insurer give you a WSDL, use sbt to compile and use their methods to construct the data and send them to the api pricer.
 
-Second case, less easy, you can not use the wsdl (too old for play) or pricer does not give you that, and you have to write manually the xml and call manually the api pricer.
+Second case, less easy, you can not use or do not have the wsdl then you have to write manually the xml and call manually the api insurer.
 In this case you can use [XML confect](https://github.com/mthaler/xmlconfect).
 
 # Build sbt
