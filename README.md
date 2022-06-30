@@ -368,14 +368,6 @@ case class Offer(
 external_data is data that you need in order to complete select part. You are free to decide JSON structure.
 If during the select insurer return you a link, you have to create an external_data.
 
-##### InternalData
-
-// TODO : I have no idea what it is --> need help for that
-
-##### PaymentData
-
-// TODO : I have no idea what it is --> need help for that
-
 # Select endpoint
 
 You should implement the method in `NewPricerService.select`
