@@ -1,10 +1,10 @@
-package new_pricer.new_vertical
+package newpricer
 
 import domain._
 import helpers.sorus.Fail
 import helpers.sorus.SorusDSL.Sorus
-import new_pricer.new_vertical.models.{ NewPricerConfig, NewPricerRequest }
-import new_pricer.services.NewPricerService
+import newpricer.models.{ InputFormatFactory, NewPricerConfig, NewPricerJsonParser, NewPricerRequest }
+import newpricer.services.NewPricerService
 import play.api.Logging
 import play.api.libs.json._
 import scalaz.\/
@@ -17,7 +17,8 @@ class NewPricer @Inject() (
   service: NewPricerService
 ) extends PricerService
     with Sorus
-    with Logging {
+    with Logging
+    with NewPricerJsonParser {
 
   def input_quote_format(pricer_id: String): List[InputFormat] = {
     InputFormatFactory.input_format_quote

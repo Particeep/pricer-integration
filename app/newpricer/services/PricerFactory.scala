@@ -1,4 +1,4 @@
-package services
+package newpricer.services
 
 import domain.PricerService
 import helpers.sorus.Fail

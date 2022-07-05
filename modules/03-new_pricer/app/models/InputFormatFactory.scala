@@ -1,4 +1,4 @@
-package new_pricer.new_vertical
+package newpricer.models
 
 import domain.InputFormat
 

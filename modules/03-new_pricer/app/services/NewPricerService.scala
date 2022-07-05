@@ -1,15 +1,15 @@
-package new_pricer.services
+package newpricer.services
 
-import new_pricer.new_vertical.models._
 import domain._
 import helpers.sorus.Fail
 import helpers.sorus.SorusDSL.Sorus
+import newpricer.models.{ NewPricerConfig, NewPricerRequest, SelectData }
+import play.api.libs.ws.WSClient
+import play.api.{ Configuration, Logging }
+import scalaz.\/
 
 import javax.inject.{ Inject, Singleton }
-import play.api.{ Configuration, Logging }
 import scala.concurrent.{ ExecutionContext, Future }
-import scalaz.\/
-import play.api.libs.ws.WSClient
 
 @Singleton
 private[new_pricer] class NewPricerService @Inject() (
