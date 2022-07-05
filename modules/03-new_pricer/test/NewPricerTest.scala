@@ -1,4 +1,4 @@
-package newpricer
+package newpricer.test
 
 import org.scalatestplus.play.PlaySpec
 

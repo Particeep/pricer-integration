@@ -12,7 +12,7 @@ import javax.inject.{ Inject, Singleton }
 import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
-private[new_pricer] class NewPricerService @Inject() (
+private[newpricer] class NewPricerService @Inject() (
   val ws:          WSClient,
   val config:      Configuration
 )(implicit val ec: ExecutionContext)
@@ -20,11 +20,11 @@ private[new_pricer] class NewPricerService @Inject() (
     with Sorus
     with Logging {
 
-  private[new_pricer] def quote(request: NewPricerRequest, config: NewPricerConfig): Future[Fail \/ PricerResponse] = {
+  private[newpricer] def quote(request: NewPricerRequest, config: NewPricerConfig): Future[Fail \/ PricerResponse] = {
     ???
   }
 
-  private[new_pricer] def select(
+  private[newpricer] def select(
     request:        NewPricerRequest,
     config:         NewPricerConfig,
     selected_quote: SelectData

@@ -2,7 +2,7 @@ package newpricer.models
 
 import domain.InputFormat
 
-private[new_pricer] object InputFormatFactory {
+private[newpricer] object InputFormatFactory {
 
   def input_format_quote: List[InputFormat] = {
     ???

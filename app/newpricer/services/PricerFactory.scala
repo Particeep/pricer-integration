@@ -2,14 +2,14 @@ package newpricer.services
 
 import domain.PricerService
 import helpers.sorus.Fail
-import new_pricer.new_vertical.NewPricerNewVertical
+import newpricer.NewPricer
 import scalaz.{ -\/, \/, \/- }
 
 import javax.inject.{ Inject, Singleton }
 
 @Singleton
 class PricerFactory @Inject() (
-  new_pricer: NewPricerNewVertical
+  new_pricer: NewPricer
 ) {
 
   def build(pricer_id: String): Fail \/ PricerService = {
