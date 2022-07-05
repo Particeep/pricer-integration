@@ -493,7 +493,7 @@ You should do these kins of renaming
 * code must be written in english
 * code in type level and respect functional programming (no side effect, use monad etc..)
 * encapsulate each of your class in private[new_pricer] except for the three methods implemented by `PricerService`
-* We use generally private[this] in the front of a val or def.
+* encapsulate your code as much as possible, e.g. use private[this] when needed.
 * run `sbt scalastyle` and clean warning
 * run `sbt fmt`
 
@@ -501,7 +501,6 @@ You should do these kins of renaming
 
 - All technical error must be contained on a Fail.
 - All business error must be contained on a `PricerError` (when it is possible).
-- use logger.info only if it is important that is to say when received data in input and output.
 
 # Testing
 

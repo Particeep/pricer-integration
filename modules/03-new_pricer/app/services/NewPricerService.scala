@@ -27,7 +27,7 @@ private[newpricer] class NewPricerService @Inject() (
   private[newpricer] def select(
     request:        NewPricerRequest,
     config:         NewPricerConfig,
-    selected_quote: SelectData
+    selected_quote: Quote
   ): Future[Fail \/ Quote] = {
     ???
   }

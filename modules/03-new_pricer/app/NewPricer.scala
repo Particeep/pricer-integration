@@ -47,15 +47,10 @@ class NewPricer @Inject() (
     subscription_input:     SelectSubscriptionInput
   ): Future[Fail \/ SelectSubscriptionOutput] = {
     for {
-      pricer_request <- subscription_input.data.validate[NewPricerRequest] ?| ()
-      select_data    <- pricer_request.select_data                         ?| "select data for new_pricer new_vertical is empty"
-      auth           <- broker_config                                      ?| "error.broker.login.required"
-      broker_config  <- auth.validate[NewPricerConfig]                     ?| ()
-      updated_quote  <- service.select(
-                          pricer_request,
-                          broker_config,
-                          select_data // put select data directly avoid to carry option during  service part
-                        ) ?| ()
+      pricer_request <- subscription_input.data.validate[NewPricerRequest]                               ?| ()
+      auth           <- broker_config                                                                    ?| "error.broker.login.required"
+      broker_config  <- auth.validate[NewPricerConfig]                                                   ?| ()
+      updated_quote  <- service.select(pricer_request, broker_config, subscription_input.selected_quote) ?| ()
     } yield {
       SelectSubscriptionOutput("200", updated_quote)
     }

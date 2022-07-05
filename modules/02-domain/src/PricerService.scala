@@ -8,10 +8,6 @@ import scala.concurrent.Future
 
 trait PricerService {
 
-  def input_format(pricer_id: String): List[InputFormat] = {
-    input_quote_format(pricer_id) ++ input_select_format(pricer_id)
-  }
-
   def input_quote_format(pricer_id: String): List[InputFormat]
 
   def input_select_format(pricer_id: String): List[InputFormat]
