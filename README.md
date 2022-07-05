@@ -486,7 +486,7 @@ You should do these kins of renaming
 * do not add library without consulting us first
 * use [OffsetDateTime](https://docs.oracle.com/javase/8/docs/api/java/time/OffsetDateTime.html) for date
 * don't throw exception : use `Fail \/ A` to catch error
-* to use try/catch of Java
+* don't use try/catch
 * be non-blocking : never do blocking in the main execution context or in the play's execution context cf. [play's doc](https://www.playframework.com/documentation/2.8.x/ThreadPools)
 * clean compilation error and warning (it exists warning that you can't delete. Delete warning only present on your pricer integration.)
 * code must be written in snake_case
