@@ -9,17 +9,29 @@ import org.scalatestplus.play.PlaySpec
 class NewPricerTest extends PlaySpec {
 
   "NewPricer NewVertical" should {
-    "do a quote and succeed" in {}
+    "do a quote and succeed" in {
+      1 must be(2)
+    }
 
-    "do a select and succeed" in {}
+    "do a select and succeed" in {
+      1 must be(2)
+    }
 
-    "parse business error in quote" in {}
+    "parse business error in quote" in {
+      1 must be(2)
+    }
 
-    "parse technical error during quote" in {}
+    "parse technical error during quote" in {
+      1 must be(2)
+    }
 
-    "parse business error in select" in {}
+    "parse business error in select" in {
+      1 must be(2)
+    }
 
-    "parse technical during select" in {}
+    "parse technical during select" in {
+      1 must be(2)
+    }
   }
 
 }
