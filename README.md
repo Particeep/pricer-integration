@@ -15,16 +15,16 @@ The application allow
 ## Requirement
 
 * Java 11
-* sbt 1.6.1
+* sbt 1.6.2
 * scala 2.13.8
 
 ## Setup
 
-You need to clone the repository. With https method you need a PAT (Personal Access Token)
+You need to clone the repository.
 ```
 git clone https://github.com/Particeep/pricer-integration.git
 ```
-You can clone the repository with ssh method, but you need to create key
+Or in ssh :
 ```
 git clone git@github.com:Particeep/pricer-integration.git
 ```
@@ -47,7 +47,7 @@ There are 3 sbt modules
 
 # Your Goal
 
-The goal is to complete the module of `/modules/03-new_pricer` with code that implement the pricer you have been assigned.
+The goal is to complete the module of `/modules/03-newpricer` with code that implement the pricer you have been assigned.
 
 Especially this parts that contains un-implemented method
 
@@ -157,7 +157,7 @@ NB 2: if `is_array` is false and `multiple` is true then is the case where it cr
 
 You have to implement the method in `NewPricerService.quote`.
 ```scala
-private[new_pricer] def quote(
+def quote(
     request: NewPricerRequest,
     config:  NewPricerConfig
   ): Future[Fail \/ PricerResponse] = {
@@ -170,18 +170,13 @@ private[new_pricer] def quote(
 The input type `NewPricerRequest` and `NewPricerConfig` should be defined by you according to the requirement of the webservice you're working on.
 They should reflect the input format you define.
 
-You should document what difficulty you faced during developpement and what did you do. For instance if a pricer have a wsdl, but it is too old for play, you have to explain that and
-explain what did you do to resolve this problem.
-
 ## Output
 
 * `\/` is the [scalaz disjunction](https://eed3si9n.com/learning-scalaz/Either.html), it works almost like the standard `Either`
 * `Fail` is an error type, defined in the project. It's a wrapper on a String and a stacktrace.
 
-### PricerResponse 
-
-This is the type that you have to return to the method quote. There is many class for this object, and we will see each of them. 
-But to resume, either your code return a price given by insurer with extra data specified in the doc or by us, or you return an error divided in two types. 
+### PricerResponse
+This is the type that you have to return to the method quote.
 
 #### PricerError
 
@@ -190,7 +185,7 @@ case class PricerError(message: String, args: List[String] = List.empty) extends
 ```
 
 `PricerError` is use when insurer API return a business error.
-A business error is an error which explicit the insurer refuse user because there is no coherence in the data.
+A business error is a case where the insurer refuses the user due to an inconsistency in the data.
 
 For instance driver age is inferior to 18. Another example you can not say you have a good vision but at the same time you are blind.
 
@@ -213,12 +208,8 @@ At this moment you have to put the reason and use this class. It can be for inst
 ```
 There are no offer for you in our database accoring to your profile : you did too much infraction this year.
 ```
-As you can see, there is the type `Meta` and `URL`.
+As you can see, there is the type `Meta` and `URL`. Ignore `URL`.
 
-`URL` is rarely use, put an empty string only if we do not say what to put :
-```scala
-val url : URL = URL("")
-```
 `Meta` is a type which structure text.
 ```scala
 case class Meta(
@@ -230,23 +221,23 @@ case class Meta(
 )
 ```
 In general, you will use title and description. You will use the rest of the attribute if we specific to you this requirement.
-Attributes title, sub_title and description are subject to I18n, so you need to declare in `message.en.conf` and `message.fr.conf` in new_pricer directory fields and value and call them.
+Attributes title, sub_title and description are subject to I18n, so you need to declare in `message.en.conf` and `message.fr.conf` in newpricer directory fields and value and call them.
 
 Example : 
 
 In `message.en.conf` we have this :
 ````
-new_pricer.title.decline = "Quote denied"
-new_pricer.title.description = "you are not eligible"
+newpricer.title.decline = "Quote denied"
+newpricer.title.description = "you are not eligible"
 ````
 And in `message.fr.conf` we have this :
 ````
-new_pricer.title.decline = "Tarification refusée"
-new_pricer.title.description = "Vous n'êtes pas éligble."
+newpricer.title.decline = "Tarification refusée"
+newpricer.title.description = "Vous n'êtes pas éligble."
 ````
 your `Meta` will be : 
 ```scala
-val meta : Meta = Meta(title = "new_pricer.title.decline".some, description = "new_pricer.title.description".some )
+val meta : Meta = Meta(title = "newpricer.title.decline".some, description = "newpricer.title.description".some )
 ```
 
 #### Offer
@@ -260,43 +251,25 @@ case class Offer(
                   meta:          Option[Meta]         = None
                 ) extends PricerResponse
 ```
-The type `Offer` is use when insurer API give you a price. So this is the positive case. This type is always with the type `Price`, but we will see it later.
+The type `Offer` is use when insurer API give you a price. This is a success caseThis type is always with the type `Price`, but we will see it later.
 Overall, you have to put data according to what we demand. You will have to put :
 
-##### Price
+##### Amount
 
-```scala
-case class Price(
-                  amount_ht:   Amount,
-                  owner_fees:  Amount    = Amount(0),
-                  broker_fees: Amount    = Amount(0),
-                  taxes:       Amount    = Amount(0),
-                  currency:    Currency  = Currency.getInstance("EUR"),
-                  frequency:   Frequency = Frequency.ONCE
-                )
-```
-For us, a price that insurer API give you, is of type `Amount`.
+For us, a price that insurer API give you, is of type `Amount`. All monetary amounts are in cents.
+
 ```scala
 case class Amount(value: Int)
 ```
-You have to convert your price into `Int`, but you have two restrictions : 
-- first, you don't have to use `toInt` directly because we work with type `BigDecimal`.
-- second, take always two numbers after comma because all monetary amounts are in cents. 
-You can use this already defined in `PricerBaseCalculator`:
-```scala
- def amountFromDoubleToCentime(amount: Double): Int =
-  (BigDecimal(amount) * BigDecimal(100)).setScale(2, BigDecimal.RoundingMode.HALF_UP).toInt
-```
-if you have to do operation on price use object `PricerBaseCalculator` and do not hesitate to add new operation with `Int`, `double` or `Long` for your need.
-
-Example : 
-Imagine insurer API return a price and the price 123.34, you have to do :
+Example :
+insurer API return a price and the price 123.34, you have to do :
 ```scala
 import utils.NumberUtils
 val result_request : Double = 123.34 // res0 : 123.34
 val amount : Amount = Amount(NumberUtils.amountFromDoubleToCentime(result_request)) // res1 : Amount(12334)
 ```
-Now we know what is `Amount`, we can return to the type `price`
+##### Price
+
 ```scala
 case class Price(
                   amount_ht:   Amount,
@@ -321,7 +294,7 @@ broker_fees :  234€
 And the price that insurer API give you, is 12€. So you need to feed your type price like that
 ```scala
 val price : Price = Price(
-    amount_ht   = Amount(1200),
+    amount_ht   = Amount(NumberUtils.amountFromDoubleToCentime(12)),
     taxes       = Amount(NumberUtils.amountFromDoubleToCentime(1337.21)),
     broker_fees = Amount(234)
   )
@@ -368,6 +341,10 @@ case class Offer(
 external_data is data that you need in order to complete select part. You are free to decide JSON structure.
 If during the select insurer return you a link, you have to create an external_data.
 
+external_data will be passed identically between quote and select
+It is used to transmit data necessary for the call a select as a specific id
+
+
 # Select endpoint
 
 You should implement the method in `NewPricerService.select`
@@ -395,83 +372,13 @@ the link in external data
 
 # Fail and ?|
 
-## ?| aka Sorus
-
-Sorus take inspiration from [Play Monadic Action](https://github.com/Driox/play-monadic-actions) to extend the DSL outside of Actions.
-It provides some syntactic sugar that allows boilerplate-free combination of "classical" type such as `Future[Option[A]]`, `Future[Either[A, B]]`, `Future[A]` using for-comprehensions. It also provides a simple and powerful way to handle error via `Fail`
-
-This [article](https://medium.com/@adriencrovetto/130034b21b37) explains in greater detail the problem that this project addresses, and how to use the solution in your own projects.
-
-## Usage
-
-The DSL adds the `?|` operator to most of the types one could normally encounter (such as `Future[A]`, `Future[Option[A]]`, `Either[B,A]`, Future[Fail \/ A], etc...). The `?|` operator will transform the "error" part of the type to `Fail` (ie. None for Option, Left for Either, etc...) returning an `EitherT[Future, Fail, A]` (which is aliased to `Step[A]` for convenience)
-It enables the writing of the whole action as a single for-comprehension.
-Implicit conversion allows us to retrieve a `Future[Fail \/ A]` as a result of the for-comprehension
-
-~~~scala
-package exemples
-
-import helpers._
-import helpers.SorusDSL._
-import scala.concurrent.Future
-import scalaz._
-
-class BasicExemple extends Sorus {
-
-  // Sample User class
-  final case class User(id:Option[Long], email:String, validate:Boolean)
-
-  def do_something(): Future[Fail \/ User] = {
-    for {
-      user <- load_User(12L)       ?| "Error while loading user"     // <- you don't create Fail yourself but the ?| operator do it for you
-      _    <- user.validate       ?| "Account need to be validated"
-      _    <- log_user_action(user) ?| ()                             // <- You can just forward underlying Fail without adding a message
-    } yield {
-      user
-    }
-  }
-
-  def load_user(id:Long):Future[Option[User]] = {
-    // Load it from DB / API / Services ...
-    Future.successful(Some(User(Some(id), "foo@bar.com", false)))
-  }
-
-  def log_user_action(user:User):Future[Fail \/ Unit] = {
-    for {
-      id <- user.id ?| "Can't log action of user wihtout id"
-    } yield {
-      println(s"user $id access the resource")
-    }
-  }
-}
-~~~
-
-## Fail
-
-`Fail` will accumulate error and if you compose multiple Fails. It has convenient method to retrieve information about the error :
-
-~~~scala
-import helpers.sorus.Fail
-
-val exception_1:Throwable = new IllegalArgumentException
-
-// this return a type Fail with a message next to the exeception.
-val fail = Fail("Error during something important in the code").withEx(exception_1)
-
-// This code give just the message of the fail
-val lastErrorMessage:String = fail.message // return : "Error during something important in the code"
-
-val exception_2:Option[Throwable] = fail.getRootException()
-
-val allMessagesInOneString:String = fail.userMessage()
-~~~
-
+for more detail, see this article : https://medium.com/@adriencrovetto/error-handling-in-scala-with-play-framework-130034b21b37
 
 # General rules
 
 ## Renaming
 
-rename new_pricer and new_vertical with the real name of the pricer you will work on
+rename newpricer with the real name of the pricer you will work on
 
 Ex: you work on a home insurance for Axa home
 You should do these kins of renaming
@@ -492,7 +399,7 @@ You should do these kins of renaming
 * code must be written in snake_case
 * code must be written in english
 * code in type level and respect functional programming (no side effect, use monad etc..)
-* encapsulate each of your class in private[new_pricer] except for the three methods implemented by `PricerService`
+* encapsulate each of your class in private[newpricer] except for the three methods implemented by `PricerService`
 * encapsulate your code as much as possible, e.g. use private[this] when needed.
 * run `sbt scalastyle` and clean warning
 * run `sbt fmt`
@@ -533,8 +440,8 @@ So the test can be
 // https://www.scalatest.org/
 "NewPriceService test" should {
   "Success, because it return a price" in {
-    val new_pricer_service = app.injector.instanceOf[NewPricerService]
-    val result = await(new_pricer_service.get_price(data, config, TypeOfFormula.BASIC))
+    val newpricer_service = app.injector.instanceOf[NewPricerService]
+    val result = await(newpricer_service.get_price(data, config, TypeOfFormula.BASIC))
 
     // https://www.scalatest.org/user_guide/using_assertions
     result match {
@@ -550,7 +457,7 @@ So you have to create an object like this :
 ~~~scala
 import java.time.OffsetDateTime
 
-private[new_pricer] object NewPricerUtils {
+object NewPricerUtils {
   def to_timestamps_unix(date: OffsetDateTime): String = date.toInstant.getEpochSecond
 }
 ~~~
