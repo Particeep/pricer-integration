@@ -31,8 +31,6 @@ test-result
 .metals/
 .bloop/
 project/metals.sbt
-
-
 .ammonite/
 
 # file system

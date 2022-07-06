@@ -1,7 +1,7 @@
 package controllers
 
 import domain._
-import newpricer.services.PricerFactory
+import services.PricerFactory
 
 import javax.inject.{ Inject, Singleton }
 import play.api.Configuration
