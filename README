@@ -397,33 +397,21 @@ For more detail, see this article : https://medium.com/@adriencrovetto/error-han
 
 # General rules
 
-## Renaming
-
-rename newpricer with the real name of the pricer you will work on
-
-Ex: you work on a home insurance for Axa home
-You should do these kins of renaming
-
-* `03-new_prier` -> `03-axa`
-* `package newpricer.xxx` -> `package axa.home.xxx`
-* `NewPricer` in class / function name would become `AxaHome`
-
 # Coding standard
 
 * no `var`, no `null`
-* do not add library without consulting us first
-* use [OffsetDateTime](https://docs.oracle.com/javase/8/docs/api/java/time/OffsetDateTime.html) for date
-* don't throw exception : use `Fail \/ A` to catch error
-* don't use try/catch
-* be non-blocking : never do blocking in the main execution context or in the play's execution context cf. [play's doc](https://www.playframework.com/documentation/2.8.x/ThreadPools)
-* clean compilation error and warning (it exists warning that you can't delete. Delete warning only present on your pricer integration.)
-* code must be written in snake_case
-* code must be written in english
-* code in type level and respect functional programming (no side effect, use monad etc..)
-* encapsulate each of your class in private[newpricer] except for the three methods implemented by `PricerService`
-* encapsulate your code as much as possible, e.g. use private[this] when needed.
-* run `sbt scalastyle` and clean warning
-* run `sbt fmt`
+* do not add a library without consulting us first
+* use [OffsetDateTime](https://docs.oracle.com/javase/8/docs/api/java/time/OffsetDateTime.html) for dates
+* don't throw an exception: use `Fail \/ A` to catch errors
+* do not use try/catch
+* be non-blocking : never do blocking code in the main execution context or in play's execution context cf. [play framework documentation](https://www.playframework.com/documentation/2.8.x/ThreadPools)
+* clean compilation error and warning (There are some warnings you cannot remove. Only  suppress warnings that are present in your own code)
+* the code must be written in snake_case
+* the code must be written in English
+* respect the principle of functional programming as much as possible
+* enforce encapsulation as much as possible, e.g. use private[newpricer] except for the three methods implemented by `PricerService`. Use private[this] if needed.
+* run `sbt scalastyle` and clean up the warning
+* run `sbt fmt` and format the code
 
 # error management and log
 
@@ -432,67 +420,18 @@ You should do these kins of renaming
 
 # Testing
 
-It is important to test what you did. The main aims is to test program behavior
+It is important to test your code
 
 You will have to test many cases :
-- test case when you received a price
-- test case when your select is ok
-- test case when pricer return technical error
-- test case when pricer return business error
 
-You do not need to test library you use
-(for instance do not create a test which examine if ws client send data or if format json from jsonx.formatCaseClass works).
-You do not need to re test your tools, test only what you created.
+- test case when you do a quote and succeed
+- test case when you do a quote and fail with business error
+- test case when you do a quote and fail with other error
+- test case when you do a select and succeed
+- test case when you do a select and fail with business error
+- test case when you do a select and fail with other error
+- test all complex data transformations
 
-When you have to test quote part, do not write a test which compare a price in the code with what api insurer give you.
-Because an insurer does not have fix price it can change when he wants. You can compare then the AST that you have defined
-and see if during the test you receive the good type which carry price.
-
-For instance, we can consider this AST
-~~~scala
-sealed trait NewPricerNewResponse
-
-final case class NewPricerPrice(value : Double) extends NewPricerNewResponse
-final case class NewPricerError(code_error : Int, reason  : String) extends NewPricerNewResponse
-~~~
-
-So the test can be
-~~~scala
-// https://www.scalatest.org/
-"NewPriceService test" should {
-  "Success, because it return a price" in {
-    val newpricer_service = app.injector.instanceOf[NewPricerService]
-    val result = await(newpricer_service.get_price(data, config, TypeOfFormula.BASIC))
-
-    // https://www.scalatest.org/user_guide/using_assertions
-    result match {
-      case \/-(NewPricerPrice(_)) => succeed
-      case not_expected => fail(s"Error during get price -> $not_expected")
-    }
-  }
-}
-~~~
-
-If you create method that transform data you have to write test. For instance, insurer want to get date into timestamps unix.
-So you have to create an object like this :
-~~~scala
-import java.time.OffsetDateTime
-
-object NewPricerUtils {
-  def to_timestamps_unix(date: OffsetDateTime): String = date.toInstant.getEpochSecond
-}
-~~~
-You need to test this method. In directory test you have to write a new class called for instance "NewPricerMethodTest.scala" and the method with an expected result
-
-~~~scala
-"NewPricer new vertical format_date method" should {
-  "succeed when formatting date" in {
-    val date_test = OffsetDateTime.now(ZoneOffset.UTC).withNano(0)
-    val date_to_timestamp: Long = to_timestamps_unix(date_test)
-
-   val  revert_date_test_to_offsetdatetime = new Date(date_to_timestamp * 1000).toInstant.atOffset(ZoneOffset.UTC)
-
-    date_test.compareTo(date_to_offsetdatetime) must be(0)
-  }
-}
-~~~
+Do not test the library:
+- don't test Play json macro
+- don't test WSClient
