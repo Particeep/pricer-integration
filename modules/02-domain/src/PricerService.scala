@@ -8,14 +8,14 @@ import scala.concurrent.Future
 
 trait PricerService {
 
-  def input_quote_format(pricer_id: String): List[InputFormat]
-
-  def input_select_format(pricer_id: String): List[InputFormat]
+  def input_format(pricer_id: String): List[InputFormat]
 
   def quote(broker_config: Option[JsValue])(
     pricer_id:             String,
     quote_input:           QuoteInput
   ): Future[Fail \/ PricerResponse]
+
+  def input_select_format(pricer_id: String): List[InputFormat]
 
   def select(broker_config: Option[JsValue])(
     pricer_id:              String,

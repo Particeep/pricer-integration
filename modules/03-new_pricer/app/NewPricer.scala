@@ -20,12 +20,8 @@ class NewPricer @Inject() (
     with Logging
     with NewPricerJsonParser {
 
-  def input_quote_format(pricer_id: String): List[InputFormat] = {
+  def input_format(pricer_id: String): List[InputFormat] = {
     InputFormatFactory.input_format_quote
-  }
-
-  def input_select_format(pricer_id: String): List[InputFormat] = {
-    InputFormatFactory.input_format_select
   }
 
   def quote(broker_config: Option[JsValue])(
@@ -34,12 +30,16 @@ class NewPricer @Inject() (
   ): Future[Fail \/ PricerResponse] = {
     for {
       pricer_request <- quote_input.input_json.validate[NewPricerRequest] ?| ()
-      auth           <- broker_config                                     ?| "error.broker.login.required" // defined in I18n in the directory newpricer
+      auth           <- broker_config                                     ?| "error.broker.login.required"
       broker_config  <- auth.validate[NewPricerConfig]                    ?| ()
       result         <- service.quote(pricer_request, broker_config)      ?| ()
     } yield {
       result
     }
+  }
+
+  def input_select_format(pricer_id: String): List[InputFormat] = {
+    InputFormatFactory.input_format_select
   }
 
   def select(broker_config: Option[JsValue])(

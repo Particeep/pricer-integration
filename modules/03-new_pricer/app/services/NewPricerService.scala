@@ -3,7 +3,7 @@ package newpricer.services
 import domain._
 import helpers.sorus.Fail
 import helpers.sorus.SorusDSL.Sorus
-import newpricer.models.{ NewPricerConfig, NewPricerRequest, SelectData }
+import newpricer.models.{ NewPricerConfig, NewPricerRequest }
 import play.api.libs.ws.WSClient
 import play.api.{ Configuration, Logging }
 import scalaz.\/
@@ -20,7 +20,10 @@ private[newpricer] class NewPricerService @Inject() (
     with Sorus
     with Logging {
 
-  private[newpricer] def quote(request: NewPricerRequest, config: NewPricerConfig): Future[Fail \/ PricerResponse] = {
+  private[newpricer] def quote(
+    request: NewPricerRequest,
+    config:  NewPricerConfig
+  ): Future[Fail \/ PricerResponse] = {
     ???
   }
 
