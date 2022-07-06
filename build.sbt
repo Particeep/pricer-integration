@@ -25,7 +25,7 @@ lazy val domain: Project     = (project in file("modules/02-domain"))
   .settings(commonSettings: _*)
   .dependsOn(core % "test->test;compile->compile")
 
-lazy val new_pricer: Project = (project in file("modules/03-new_pricer")).enablePlugins(PlayScala)
+lazy val new_pricer: Project = (project in file("modules/03-new_pricer"))
   .settings(commonPlaySettings: _*)
   .dependsOn(core % "test->test;compile->compile", domain)
 
