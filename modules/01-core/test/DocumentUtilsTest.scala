@@ -9,7 +9,7 @@ import scala.concurrent.duration.DurationInt
 
 class DocumentUtilsTest extends AnyWordSpec with GuiceOneServerPerTest with Logging {
 
-  "DocumentUtilsTest" should {
+  "DocumentUtilsTest" ignore {
 
     val doc_pdf_url = "http://document.particeep.com/8f411945-ed53-4f0b-857d-511d9c1a32a8/download"
     val doc_zip_url = "https://test-api.particeep.com/document/f41dcab0-c050-457d-b897-0dbdc2796f94"

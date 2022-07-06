@@ -5,7 +5,7 @@ import play.api.i18n.Lang
 
 object NumberUtils {
 
-  def validePrecision(value: Double, precision: Int) = {
+  def validePrecision(value: Double, precision: Int): Boolean = {
     val valueS = value.toString
     if(valueS.contains(".")) valueS.substring(valueS.indexOf(".") + 1).length <= precision else true
   }

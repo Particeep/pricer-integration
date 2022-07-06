@@ -15,10 +15,7 @@ lazy val commonSettings = Seq(
   Compile / doc / sources := Seq.empty
 )
 
-lazy val commonPlaySettings = commonSettings ++ Seq(
-  routesGenerator := InjectedRoutesGenerator,
-  libraryDependencies ++= (deps_db)
-)
+lazy val commonPlaySettings = commonSettings ++ Seq(routesGenerator := InjectedRoutesGenerator)
 
 lazy val core: Project = (project in file("modules/01-core")).enablePlugins(PlayScala)
   .settings(commonPlaySettings: _*)
@@ -28,7 +25,7 @@ lazy val domain: Project     = (project in file("modules/02-domain"))
   .settings(commonSettings: _*)
   .dependsOn(core % "test->test;compile->compile")
 
-lazy val new_pricer: Project = (project in file("modules/03-new_pricer")).enablePlugins(PlayScala)
+lazy val new_pricer: Project = (project in file("modules/03-new_pricer"))
   .settings(commonPlaySettings: _*)
   .dependsOn(core % "test->test;compile->compile", domain)
 
@@ -51,19 +48,14 @@ lazy val deps_common = Seq(
   filters,
   ehcache,
   ws,
-  "com.papertrailapp"  % "logback-syslog4j"     % "1.0.0" withSources (),
   "org.scalaz"        %% "scalaz-core"          % "7.2.30" withSources (),
   "org.apache.commons" % "commons-lang3"        % "3.9" withSources (),
-  "org.apache.commons" % "commons-email"        % "1.5" withSources (),
   "commons-codec"      % "commons-codec"        % "1.13" withSources (),
-  "commons-io"         % "commons-io"           % "2.5" withSources (),
   "commons-validator"  % "commons-validator"    % "1.6" withSources (),
   "ai.x"              %% "play-json-extensions" % "0.42.0" withSources (),
   "com.ibm.icu"        % "icu4j"                % "65.1" withSources (),
   "org.mindrot"        % "jbcrypt"              % "0.4" withSources (),
   "com.mthaler"       %% "xmlconfect"           % "0.4.8" withSources (),
-  "pl.iterators"      %% "kebs-tagged"          % "1.9.3" withSources (),
-  "pl.iterators"      %% "kebs-play-json"       % "1.9.3" withSources (),
   "jakarta.xml.bind"   % "jakarta.xml.bind-api" % "2.3.2" withSources (),
   "org.glassfish.jaxb" % "jaxb-runtime"         % "2.3.2" withSources ()
 )
@@ -75,18 +67,6 @@ lazy val deps_tests = Seq(
   )),
   "com.opentable.components" % "otj-pg-embedded"    % "0.13.3"  % Test withSources (),
   "org.gnieh"               %% "diffson-play-json"  % "4.1.1"   % Test withSources ()
-)
-
-val slick_pg_version = "0.20.2"
-
-lazy val deps_db = Seq(
-  "org.postgresql"       % "postgresql"            % "42.2.6" withSources (),
-  "com.typesafe.play"   %% "play-slick"            % "5.0.0" withSources (),
-  "com.typesafe.play"   %% "play-slick-evolutions" % "5.0.0" withSources (),
-  "com.github.tminglei" %% "slick-pg"              % slick_pg_version withSources (),
-  "com.github.tminglei" %% "slick-pg_play-json"    % slick_pg_version withSources () excludeAll (ExclusionRule(
-    organization = "com.typesafe.play"
-  ))
 )
 
 // ~~~~~~~~~~~~~~~~~

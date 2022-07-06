@@ -32,8 +32,11 @@ object PricerResponse {
   }
 
   /**
+   * @param price : the price returned by the insurer
+   * @param detail : a list of items related to insurance coverage
    * @param internal_data : custom & complex data to display, such as payment schedule
    * @param external_data : data to carry to other requests on external pricer
+   * @param meta : marketing data about the offer
    */
   case class Offer(
     price:         Price,
@@ -54,7 +57,9 @@ object PricerResponse {
   }
 
   /**
-   * Store detail of the offer like TAEG / options / rate / contract / documentation / etc...
+   * Store offer details like TAEG / options / rate / contract / documentation / etc...
+   * This information would be provided in the documentation
+   *
    * @param kind: image | text | pdf | link | etc...
    */
   case class OfferItem(label: String, value: String, kind: String, args: List[String] = List.empty) {
