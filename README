@@ -49,27 +49,23 @@ There are 3 sbt modules
 
 The goal is to complete the module of `/modules/03-newpricer` with code that implement the pricer you have been assigned.
 
-Especially this parts that contains un-implemented method
+Especially this parts that contains un-implemented method i.e. the `???` part
 
-* `InputFormatFactoryNewPricerNewVertical.input_format_quote`
-* `InputFormatFactoryNewPricerNewVertical.input_format_select`
-* `NewPricerNewVertical.quote`
-* `NewPricerNewVertical.select`
+* `InputFormatFactory.input_format_quote`
+* `InputFormatFactory.input_format_select`
+* `NewPricerService.quote`
+* `NewPricerService.select`
 
-And un-implemented case class 
-* QuoteData
-* SelectData
-* NewPricerConfig
+And empty case class
+
+* `NewPricerQuoteRequest`
+* `NewPricerSelectRequest`
+* `NewPricerConfig`
 
 # InputFormat
 
-You need to implement 2 InputFormat
-
-* `InputFormatFactoryNewPricerNewVertical.input_format_quote`
-* `InputFormatFactoryNewPricerNewVertical.input_format_select`
-
 InputFormat is a schema that describes json in a way that suit our need.
-The building bloc are defined in the domain module
+The building blocs are defined in the domain module
 
 * `input_format_quote` describe the json input of the `quote` endpoint
 * `input_format_select` describe the json input of the `select` endpoint, minus every fields that are already defined in `input_format_quote`
@@ -158,7 +154,7 @@ NB 2: if `is_array` is false and `multiple` is true then is the case where it cr
 You have to implement the method in `NewPricerService.quote`.
 ```scala
 def quote(
-    request: NewPricerRequest,
+    request: NewPricerQuoteRequest,
     config:  NewPricerConfig
   ): Future[Fail \/ PricerResponse] = {
     ???
@@ -167,8 +163,8 @@ def quote(
 
 ## Input
 
-The input type `NewPricerRequest` and `NewPricerConfig` should be defined by you according to the requirement of the webservice you're working on.
-They should reflect the input format you define.
+The input type `NewPricerQuoteRequest` and `NewPricerConfig` should be defined by you according to the requirement of the webservice you're working on.
+They should reflect the input format you defined.
 
 ## Output
 
@@ -184,33 +180,45 @@ This is the type that you have to return to the method quote.
 case class PricerError(message: String, args: List[String] = List.empty) extends PricerResponse
 ```
 
-`PricerError` is use when insurer API return a business error.
-A business error is a case where the insurer refuses the user due to an inconsistency in the data.
+`PricerError` is use when insurer's API return a business error.
+A business error is
 
-For instance driver age is inferior to 18. Another example you can not say you have a good vision but at the same time you are blind.
+- where the insurer refuses the user due to an inconsistency in the data. For instance driver age is lower than 18
+- where the error case is documented in the API's documentation. For instance a list of error code
 
-Unfortunately, api insurer can make difficult how to separate technical problem from business problem. In this case you can return a sentence like "you are not eligible"
-and put on a `Fail` what the api insured return.
+A technical problem is every thing else. For instance
+- missing data or data is not understood by the api insurer.
+- parsing error
+- network error like a Future that timeout
+- serveur error like http 500 error
+- etc...
 
-A technical problem is an error on data. For instance, they are missing data or data is not understood by the api insurer.
-That implied you made a mistake in the code, and you have to correct it.
+Technical error are handled via a `Fail`
 
-Insurer API can send respond in english or in French. You do not have to translate.
+Unfortunately, api's documentation is not always clear. If you don't know if the error is business or technical then make it a technical error
+
+NB : Insurer API can send respond in english or in French. You do not need to translate the response.
 
 #### Decline
 
 ```scala
 case class Decline(url: URL, meta: Option[Meta] = None) extends PricerResponse
 ```
-`Decline` is use when insurer API refuse to give you a price because your profile is not eligible. 
-All data from user are good and consistent, but Insurer API does not want to insure this user profile.
-At this moment you have to put the reason and use this class. It can be for instance :
+`Decline` is use when insurer API refuse to give you a price because your profile is not eligible.
+All data from user are good and consistent, but the insurer does not want to insure this user.
+
+In this case you have to put the reason in a Decline class. It can be for instance :
 ```
-There are no offer for you in our database accoring to your profile : you did too much infraction this year.
+Decline(
+  URL("http://not_used.com"),
+  Some(Meta(title = Some("There are no offer for you in our database accoring to your profile.")))
+)
 ```
+
 As you can see, there is the type `Meta` and `URL`. Ignore `URL`.
 
 `Meta` is a type which structure text.
+
 ```scala
 case class Meta(
   title:       Option[String]             = None,
@@ -220,24 +228,33 @@ case class Meta(
   args:        Map[String, List[String]]  = Map.empty
 )
 ```
-In general, you will use title and description. You will use the rest of the attribute if we specific to you this requirement.
-Attributes title, sub_title and description are subject to I18n, so you need to declare in `message.en.conf` and `message.fr.conf` in newpricer directory fields and value and call them.
 
-Example : 
+In general, you will use title and description. You will use the rest of the attributes if we tell you to do so.
+`title`, `sub_title` and `description` are subject to I18n, so you need to declare an entry in `message.en.conf` and `message.fr.conf` in `conf/i18n/newpricer`
+
+Example :
 
 In `message.en.conf` we have this :
+
 ````
 newpricer.title.decline = "Quote denied"
 newpricer.title.description = "you are not eligible"
 ````
+
 And in `message.fr.conf` we have this :
+
 ````
 newpricer.title.decline = "Tarification refusée"
 newpricer.title.description = "Vous n'êtes pas éligble."
 ````
-your `Meta` will be : 
+
+your `Meta` will be :
+
 ```scala
-val meta : Meta = Meta(title = "newpricer.title.decline".some, description = "newpricer.title.description".some )
+val meta : Meta = Meta(
+  title       = Some("newpricer.title.decline"),
+  description = Some("newpricer.title.description")
+)
 ```
 
 #### Offer
@@ -311,13 +328,13 @@ case class OfferItem(
 ```
 `OfferItem` is additional data which come with the price. What put in this is an information that we will give you if needed.
 
-Parameter kind is the type of your data which can be defined by us. 
+Parameter kind is the type of your data which can be defined by us.
 
 This case class is subject to I18n and like `Meta` so if needed, you have to define in message.en.newpricer.conf and
 message.fr.newpricer.conf label and value.
 
 There are something new compared to `Meta` :  the parameter args. Indeed, you can create in message.en.newpricer.conf and
-message.fr.newpricer.conf a message with a symbol in order to be replaced. For instance in message.en.conf you can have : 
+message.fr.newpricer.conf a message with a symbol in order to be replaced. For instance in message.en.conf you can have :
 ```
 message_with_custom_things = "You have {0} in your wallet and {1} in your hand
 ```
@@ -326,7 +343,7 @@ val custom_args = List("pistol", "chewing-um")
 val offer_item = OfferItem(label = "message_with_custom_things", kind = "text" ,value = "something else", args = custom_args)
 // the message will be "You have pistol in your wallet and chewing-um in your hand"
 ```
-Now get back to type `Offer` 
+Now get back to type `Offer`
 ```scala
 case class Offer(
                   price:         Price,
@@ -360,12 +377,12 @@ private[newpricer] def select(
 ```
 ## Input
 
-This method take in input new data to send in select part. Depending on insurer you have to send again data quote but in another endpoint, 
+This method take in input new data to send in select part. Depending on insurer you have to send again data quote but in another endpoint,
 and with that new data like name, first name, phone number etc..
 
 ## Output
 
-Depending on insurer you can have many cases : 
+Depending on insurer you can have many cases :
 - what you send is data for user sign up, so you don't have to in more
 - insurance send you back (so after you send to it data) a link in order to allow user to continue the process on the insurance site and in this case you have to put
 the link in external data
@@ -419,7 +436,7 @@ You will have to test many cases :
 - test case when pricer return technical error
 - test case when pricer return business error
 
-You do not need to test library you use 
+You do not need to test library you use
 (for instance do not create a test which examine if ws client send data or if format json from jsonx.formatCaseClass works).
 You do not need to re test your tools, test only what you created.
 
@@ -435,7 +452,7 @@ final case class NewPricerPrice(value : Double) extends NewPricerNewResponse
 final case class NewPricerError(code_error : Int, reason  : String) extends NewPricerNewResponse
 ~~~
 
-So the test can be 
+So the test can be
 ~~~scala
 // https://www.scalatest.org/
 "NewPriceService test" should {
@@ -468,9 +485,9 @@ You need to test this method. In directory test you have to write a new class ca
   "succeed when formatting date" in {
     val date_test = OffsetDateTime.now(ZoneOffset.UTC).withNano(0)
     val date_to_timestamp: Long = to_timestamps_unix(date_test)
-    
+
    val  revert_date_test_to_offsetdatetime = new Date(date_to_timestamp * 1000).toInstant.atOffset(ZoneOffset.UTC)
-    
+
     date_test.compareTo(date_to_offsetdatetime) must be(0)
   }
 }
