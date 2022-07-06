@@ -3,12 +3,12 @@ Pricer Integration
 
 # Intro
 
-The main goal of the application is to display insurance's offers and allow the user to select one of them.
+The main purpose of the application is to display insurance offers and allow the user to select one of them.
 
-The application allow
+The application allows
 
-* to query insurance's webservice that return a price and some data about the insurance. We call this endpoint `quote`
-* to fulfill a contract with an insurer by providing data (name, address, etc...). We call this endpoint `select` because the end-user have selected an insurance
+* to query the insurance webservice which returns a price and some insurance data. We call this endpoint `quote`
+* to fulfill a contract with an insurer by providing data (name, address, etc...). We call this endpoint `select` because the end user has selected an insurance
 
 # Setup dev environment
 
@@ -41,15 +41,15 @@ The base application is a standard [Play](https://www.playframework.com/) applic
 
 There are 3 sbt modules
 
-* `01-core` is commons code that is available for convenience. You will probably use StringUtils or DateUtils
-* `02-domain` is the domain of the application. It defines input and output type for the part you need to implement
+* `01-core` is common code available for convenience. You will probably use StringUtils or DateUtils
+* `02-domain` is the domain of the application. It defines the input and output type for the part you need to implement
 * `03-new-pricer` is the module you need to implement.
 
 # Your Goal
 
-The goal is to complete the module of `/modules/03-newpricer` with code that implement the pricer you have been assigned.
+The main goal is to complete the module `/modules/03-newpricer` with code that implements the pricer assigned to you.
 
-Especially this parts that contains un-implemented method i.e. the `???` part
+Especially this part which contains an unimplemented method, i.e. with `???` as a body
 
 * `InputFormatFactory.input_format_quote`
 * `InputFormatFactory.input_format_select`
@@ -64,15 +64,16 @@ And empty case class
 
 # InputFormat
 
-InputFormat is a schema that describes json in a way that suit our need.
-The building blocs are defined in the domain module
+InputFormat is a schema that describes json in a way that suits our needs.
+The building blocks are defined in the domain module
 
-* `input_format_quote` describe the json input of the `quote` endpoint
-* `input_format_select` describe the json input of the `select` endpoint, minus every fields that are already defined in `input_format_quote`
+* `input_format_quote` describes the json input of the `quote` endpoint
+* `input_format_select` describes the json input of the `select` endpoint, minus any fields already defined in `input_format_quote`
 
 ## Basic structure
 
 ```scala
+
 case class InputFormat(
   // The name of the field, like the name of a field in an HTML form. It's the unique identifier of the field
   name:             String,
@@ -101,78 +102,89 @@ case class InputFormat(
   // Internal use, you don't need this
   external_service: Option[ExternalService]   = None
 )
+
 ```
 
-NB 1: if `is_array` is true then the json type is an array and items in the array are of type `kind`
+NB 1: if `is_array` is true, then the json type is an array and the elements of the array are of type `kind`
 
-NB 2: if `is_array` is false and `multiple` is true then is the case where it create a checkbox, and fields  defined by data in attribute "option".
+NB 2: if `is_array` is false and `multiple` is true then this is the case where it creates a checkbox, and fields defined by data in the "option" attribute.
 
 ## Sample Code
 
 ```scala
-  val insureds_format = {
-    InputFormat(
-      name      = "assures",
-      kind      = OBJECT,
-      mandatory = true,
-      is_array  = true,
-      fields    = Some(
-        List(
-          civility_format,
-          firstname_format,
-          lastname_format,
-          birthdate_format,
-          smoker_format
-        )
+
+val insureds_format = {
+  InputFormat(
+    name      = "assures",
+    kind      = OBJECT,
+    mandatory = true,
+    is_array  = true,
+    fields    = Some(
+      List(
+        civility_format,
+        firstname_format,
+        lastname_format,
+        birthdate_format,
+        smoker_format
       )
     )
-  }
+  )
+}
 
-  private[this] def civility_format: InputFormat = {
-    InputFormat(name = "civility", kind = ENUM, mandatory = true, options = List("MR", "MME", "MISS"))
-  }
+private[this] def civility_format: InputFormat = {
+  InputFormat(name = "civility", kind = ENUM, mandatory = true, options = List("MR", "MME", "MISS"))
+}
 
-  private[this] def firstname_format: InputFormat = {
-    InputFormat(name = "first_name", kind = TEXT, mandatory = true)
-  }
+private[this] def firstname_format: InputFormat = {
+  InputFormat(name = "first_name", kind = TEXT, mandatory = true)
+}
 
-  private[this] def lastname_format: InputFormat = {
-    InputFormat(name = "last_name", kind = TEXT, mandatory = true)
-  }
+private[this] def lastname_format: InputFormat = {
+  InputFormat(name = "last_name", kind = TEXT, mandatory = true)
+}
 
-  private[this] def birthdate_format: InputFormat = {
-    InputFormat(name = "birthdate", kind = DATE, mandatory = true)
-  }
+private[this] def birthdate_format: InputFormat = {
+  InputFormat(name = "birthdate", kind = DATE, mandatory = true)
+}
 
-  private[this] def smoker_format: InputFormat = {
-    InputFormat(name = "is_smoking", kind = BOOLEAN, mandatory = false)
-  }
+private[this] def smoker_format: InputFormat = {
+  InputFormat(name = "is_smoking", kind = BOOLEAN, mandatory = false)
+}
+
 ```
 
 # Quote endpoint
 
 You have to implement the method in `NewPricerService.quote`.
 ```scala
+
 def quote(
-    request: NewPricerQuoteRequest,
-    config:  NewPricerConfig
-  ): Future[Fail \/ PricerResponse] = {
-    ???
-  }
+  request: NewPricerQuoteRequest,
+  config:  NewPricerConfig
+): Future[Fail \/ PricerResponse] = {
+  ???
+}
+
 ```
 
 ## Input
 
-The input type `NewPricerQuoteRequest` and `NewPricerConfig` should be defined by you according to the requirement of the webservice you're working on.
+The `NewPricerQuoteRequest` and `NewPricerConfig` input type should be defined by you according to the requirements of the web service you are working on.
 They should reflect the input format you defined.
 
 ## Output
 
 * `\/` is the [scalaz disjunction](https://eed3si9n.com/learning-scalaz/Either.html), it works almost like the standard `Either`
-* `Fail` is an error type, defined in the project. It's a wrapper on a String and a stacktrace.
+* `Fail` is a type of error defined in the project. It's a wrapper over a String and a stacktrace.
 
 ### PricerResponse
-This is the type that you have to return to the method quote.
+
+This is an AST that can be one of
+
+* PricerError : used for business error
+* NeedMoreData : used when the insurer need more data. It's very rare
+* Decline : used when no price is available
+* Offer : used for success case
 
 #### PricerError
 
