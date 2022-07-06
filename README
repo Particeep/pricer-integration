@@ -156,6 +156,7 @@ private[this] def smoker_format: InputFormat = {
 # Quote endpoint
 
 You have to implement the method in `NewPricerService.quote`.
+
 ```scala
 
 def quote(
@@ -357,32 +358,42 @@ val offer_item = OfferItem(label = "message_with_custom_things", kind = "text" ,
 
 # Select endpoint
 
-You should implement the method in `NewPricerService.select`
+You have to implement the method in `NewPricerService.select`
 
 ```scala
+
 private[newpricer] def select(
-    request:        NewPricerRequest,
-    config:         NewPricerConfig,
-    selected_quote: Quote
-  ): Future[Fail \/ Quote] = {
-    ???
-  }
+  // same structure as request: NewPricerQuoteRequest but with more data
+  request:        NewPricerSelectRequest,
+
+  // broker authentication
+  config:         NewPricerConfig,
+
+  // the result of the quote endpoint
+  selected_quote: Quote
+): Future[Fail \/ Quote] = {
+  ???
+}
+
 ```
+
 ## Input
 
-This method take in input new data to send in select part. Depending on insurer you have to send again data quote but in another endpoint,
-and with that new data like name, first name, phone number etc..
+This function can only be called after a successful call to the `quote` function.
+This function receives the same input as the `quote` function with the addition of the `Quote` returned earlier.
+
+All fields included in `NewPricerQuoteRequest` will also be in `NewPricerSelectRequest`.
+`NewPricerSelectRequest` can have additional fields
+
 
 ## Output
 
-Depending on insurer you can have many cases :
-- what you send is data for user sign up, so you don't have to in more
-- insurance send you back (so after you send to it data) a link in order to allow user to continue the process on the insurance site and in this case you have to put
-the link in external data
+Just return the `selected_quote` you receive as input.
+In some cases, you may need to update some fields in the `Quote` if the web service returned an updated value for those fields.
 
-# Fail and ?|
+# Fail and `?|` operator
 
-for more detail, see this article : https://medium.com/@adriencrovetto/error-handling-in-scala-with-play-framework-130034b21b37
+For more detail, see this article : https://medium.com/@adriencrovetto/error-handling-in-scala-with-play-framework-130034b21b37
 
 # General rules
 

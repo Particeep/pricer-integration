@@ -20,6 +20,11 @@ private[newpricer] class NewPricerService @Inject() (
     with Sorus
     with Logging {
 
+  /**
+   * @param request : input for the webservice
+   * @param config : broker authentication
+   * @return
+   */
   private[newpricer] def quote(
     request: NewPricerQuoteRequest,
     config:  NewPricerConfig
@@ -27,6 +32,11 @@ private[newpricer] class NewPricerService @Inject() (
     ???
   }
 
+  /**
+   * @param request : same structure as request: NewPricerQuoteRequest but with more data
+   * @param config : broker authentication
+   * @param selected_quote : the result of the call to quote
+   */
   private[newpricer] def select(
     request:        NewPricerSelectRequest,
     config:         NewPricerConfig,
