@@ -179,12 +179,12 @@ They should reflect the input format you defined.
 
 ### PricerResponse
 
-This is an AST that can be one of
+This is an AST which can be one of
 
-* PricerError : used for business error
-* NeedMoreData : used when the insurer need more data. It's very rare
-* Decline : used when no price is available
-* Offer : used for success case
+* `PricerError`  : used for business errors
+* `NeedMoreData` : used when the insurer needs more data. It's very rare
+* `Decline`      : used when no price is available
+* `Offer`        : used if successful
 
 #### PricerError
 
@@ -192,34 +192,34 @@ This is an AST that can be one of
 case class PricerError(message: String, args: List[String] = List.empty) extends PricerResponse
 ```
 
-`PricerError` is use when insurer's API return a business error.
-A business error is
+`PricerError` is used when the insurer API returns a business error:
 
-- where the insurer refuses the user due to an inconsistency in the data. For instance driver age is lower than 18
-- where the error case is documented in the API's documentation. For instance a list of error code
+- when the insurer refuses the user due to an inconsistency in the data. For example, the driver's age is under 18
+- when the error case is documented in the API documentation. For example, an error code list
 
-A technical problem is every thing else. For instance
-- missing data or data is not understood by the api insurer.
+A technical problem is everything else. For instance
+- missing data or data not understood by the insurer api.
 - parsing error
 - network error like a Future that timeout
-- serveur error like http 500 error
+- server error like http error 500
 - etc...
 
-Technical error are handled via a `Fail`
+Technical errors are handled via a `Fail`
 
-Unfortunately, api's documentation is not always clear. If you don't know if the error is business or technical then make it a technical error
+Unfortunately, the API documentation is not always clear. If you are unsure whether the error is business or technical then make it a technical error
 
-NB : Insurer API can send respond in english or in French. You do not need to translate the response.
+NB: The Insurer API can send a response in English or in French. You don't need to translate the answer.
 
 #### Decline
 
 ```scala
 case class Decline(url: URL, meta: Option[Meta] = None) extends PricerResponse
 ```
-`Decline` is use when insurer API refuse to give you a price because your profile is not eligible.
-All data from user are good and consistent, but the insurer does not want to insure this user.
 
-In this case you have to put the reason in a Decline class. It can be for instance :
+`Decline` is used when the insurer's API refuses to give you a price because your profile is not eligible.
+All user data is good and consistent, but the insurer does not want to insure this user.
+
+In this case, you must put the reason in a `Decline` class. It can be for example:
 ```
 Decline(
   URL("http://not_used.com"),
@@ -227,9 +227,10 @@ Decline(
 )
 ```
 
-As you can see, there is the type `Meta` and `URL`. Ignore `URL`.
+As you can see there is `Meta` and `URL` type
+You can ignore `URL`
 
-`Meta` is a type which structure text.
+`Meta` is a type that structures text.
 
 ```scala
 case class Meta(
