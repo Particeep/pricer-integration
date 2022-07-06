@@ -287,6 +287,7 @@ case class Offer(
   detail:        List[OfferItem]      = List(),
 
   // custom & complex data to display, such as payment schedule
+  // you don't need it, just use default value
   internal_data: Option[InternalData] = None,
 
   // data to carry to other requests on external pricer, explained below
