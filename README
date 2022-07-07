@@ -28,7 +28,6 @@ Or in ssh :
 ```
 git clone git@github.com:Particeep/pricer-integration.git
 ```
-
 Then it's a standard sbt project
 ```
 cd pricer-integration
@@ -197,7 +196,7 @@ case class PricerError(message: String, args: List[String] = List.empty) extends
 
 `PricerError` is used when the insurer API returns a business error:
 
-- when the insurer refuses the user due to an inconsistency in the data. For example, the driver's age is under 18
+- when the insurer refuses the user due to a data inconsistency. For example, the driver's age is under 18
 - when the error case is documented in the API documentation. For example, an error code list
 
 A technical problem is everything else. For instance
@@ -209,7 +208,7 @@ A technical problem is everything else. For instance
 
 Technical errors are handled via a `Fail`
 
-Unfortunately, the API documentation is not always clear. If you are unsure whether the error is business or technical then make it a technical error
+Unfortunately, the API documentation is not always clear. If you are not sure whether the error is business one nor technical one then classify it as a technical error
 
 NB: The Insurer API can send a response in English or in French. You don't need to translate the answer.
 
@@ -245,7 +244,7 @@ case class Meta(
 )
 ```
 
-Typically, you'll use the title and description. You will use the rest of the attributes if we tell you to.
+Typically, you will use the title and description. You will use the rest of the attributes if we tell you to.
 `title`, `sub_title` and `description` are subject to i18n, so you must declare an entry in `message.en.conf` and `message.fr.conf` in `conf/i18n/newpricer`
 
 Example :
@@ -431,7 +430,7 @@ You will have to test many cases :
 - test case when you do a select and succeed
 - test case when you do a select and fail with business error
 - test case when you do a select and fail with other error
-- test all complex data transformations
+- test all complex data transformation
 
 Do not test the library:
 - don't test Play json macro
