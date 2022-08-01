@@ -63,9 +63,8 @@ And empty case class
 
 # InputFormat
 
-InputFormat is a schema that describes json in a way that suits our needs. it a kind of meta data 
-This is not like doing a method which return a type this describes data waited by webservice. After that, application will transform input format
-into data depending of webservice for instance case class for scala or XML data.
+InputFormat is a schema that describes json in a way that suits our needs.
+InputFormat is a schema that describes the json input needed by the webservice. It's a static constant.
 
 The building blocks are defined in the domain module
 
