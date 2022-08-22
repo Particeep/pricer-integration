@@ -64,6 +64,8 @@ And empty case class
 # InputFormat
 
 InputFormat is a schema that describes json in a way that suits our needs.
+InputFormat is a schema that describes the json input needed by the webservice. It's a static constant.
+
 The building blocks are defined in the domain module
 
 * `input_format_quote` describes the json input of the `quote` endpoint
