@@ -3,9 +3,9 @@ package models.enumerations
 import helpers.{ Enum, EnumHelper }
 import play.api.libs.json.{ JsString, JsValue, Writes }
 
-sealed trait Title extends Product with Serializable with Enum
+private[wakam] sealed trait Title extends Product with Serializable with Enum
 
-object Title extends EnumHelper[Title] {
+private[wakam] object Title extends EnumHelper[Title] {
 
   final case object MRS extends Title { override def label(): String = "MME" }
   final case object MR  extends Title { override def label(): String = "M."  }

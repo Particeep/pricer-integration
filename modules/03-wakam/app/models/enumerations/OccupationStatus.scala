@@ -3,9 +3,9 @@ package models.enumerations
 import helpers.{ Enum, EnumHelper }
 import play.api.libs.json.{ JsString, JsValue, Writes }
 
-sealed trait OccupationStatus extends Product with Serializable with Enum
+private[wakam] sealed trait OccupationStatus extends Product with Serializable with Enum
 
-object OccupationStatus extends EnumHelper[OccupationStatus] {
+private[wakam] object OccupationStatus extends EnumHelper[OccupationStatus] {
 
   final case object TENANT         extends OccupationStatus { override def label(): String = "Locataire"             }
   final case object OCCUPANT_OWNER extends OccupationStatus { override def label(): String = "Propriétaire occupant" }

@@ -3,9 +3,9 @@ package models.enumerations
 import helpers.{ Enum, EnumHelper }
 import play.api.libs.json.{ JsString, JsValue, Writes }
 
-sealed trait Deductible extends Product with Serializable with Enum
+private[wakam] sealed trait Deductible extends Product with Serializable with Enum
 
-object Deductible extends EnumHelper[Deductible] {
+private[wakam] object Deductible extends EnumHelper[Deductible] {
 
   final case object BASE_DEDUCTIBLE               extends Deductible { override def label(): String = "Franchise de Base" }
   final case object INCREASE_IN_DEDUCTIBLE        extends Deductible {

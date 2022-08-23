@@ -3,9 +3,9 @@ package models.enumerations
 import helpers.{ Enum, EnumHelper }
 import play.api.libs.json.{ JsString, JsValue, Writes }
 
-sealed trait CommercialLatitudeRequested extends Product with Serializable with Enum
+private[wakam] sealed trait CommercialLatitudeRequested extends Product with Serializable with Enum
 
-object CommercialLatitudeRequested extends EnumHelper[CommercialLatitudeRequested] {
+private[wakam] object CommercialLatitudeRequested extends EnumHelper[CommercialLatitudeRequested] {
   final case object `-15%` extends CommercialLatitudeRequested { override def label(): String = "-15%" }
   final case object `-10%` extends CommercialLatitudeRequested { override def label(): String = "-10%" }
   final case object `-5%`  extends CommercialLatitudeRequested { override def label(): String = "-5%"  }

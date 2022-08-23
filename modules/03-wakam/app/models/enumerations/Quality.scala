@@ -3,9 +3,9 @@ package models.enumerations
 import helpers.{ Enum, EnumHelper }
 import play.api.libs.json.{ JsString, JsValue, Writes }
 
-sealed trait Quality extends Product with Serializable with Enum
+private[wakam] sealed trait Quality extends Product with Serializable with Enum
 
-object Quality extends EnumHelper[Quality] {
+private[wakam] object Quality extends EnumHelper[Quality] {
 
   final case object `1` extends Quality { override def label(): String = "1" }
   final case object `2` extends Quality { override def label(): String = "2" }

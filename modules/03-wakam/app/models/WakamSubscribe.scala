@@ -1,4 +1,4 @@
-package newpricer.models
+package wakam.home.models
 
 import ai.x.play.json.Encoders.encoder
 import ai.x.play.json.Jsonx
@@ -6,7 +6,7 @@ import play.api.libs.json.{ JsValue, Json, OFormat, Writes }
 
 import java.time.OffsetDateTime
 
-final case class WakamSubscribe(
+private[wakam] final case class WakamSubscribe(
   quote_reference:                   String,
   reference_client:                  String,
   start_date_effect:                 OffsetDateTime,
@@ -39,7 +39,7 @@ final case class WakamSubscribe(
   previous_policy_subscription_date: OffsetDateTime
 )
 
-object WakamSubscribe {
+private[wakam] object WakamSubscribe {
   implicit val wakam_subscribe_write: Writes[WakamSubscribe] = new Writes[WakamSubscribe] {
     override def writes(wakam_subscribe: WakamSubscribe): JsValue = Json.obj(
       "QuoteReference"                   -> wakam_subscribe.quote_reference,

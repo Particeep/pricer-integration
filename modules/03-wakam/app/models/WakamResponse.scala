@@ -1,10 +1,10 @@
-package newpricer.models
+package wakam.home.models
 
 import play.api.libs.json.{ Json, OFormat }
 
-sealed trait WakamResponse
+private[wakam] sealed trait WakamResponse
 
-object WakamResponse {
+private[wakam] object WakamResponse {
 
   case class SuccessCase(QuoteReference: String, message: String, MontantTotalPrimeTTC: Double) extends WakamResponse
 

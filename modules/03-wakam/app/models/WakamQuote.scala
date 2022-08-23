@@ -1,10 +1,10 @@
-package newpricer.models
+package wakam.home.models
 
 import ai.x.play.json.Encoders.encoder
 import ai.x.play.json.Jsonx
 import play.api.libs.json.{ JsValue, Json, OFormat, Writes }
 
-final case class WakamQuote(
+private[wakam] final case class WakamQuote(
   postal_code:                         String,
   municipality:                        String,
   nature:                              String,
@@ -39,8 +39,8 @@ final case class WakamQuote(
   commercial_latitude_requested:       String
 )
 
-object WakamQuote {
-  private[this] def convert_boolean_option_toString(option: Boolean): String = {
+private[wakam] object WakamQuote {
+  private[this] def convert_boolean_to_yes_no(option: Boolean): String = {
     if(option) "Yes" else "No"
   }
   implicit val wakam_quote_write: Writes[WakamQuote]   = new Writes[WakamQuote] {
@@ -57,31 +57,31 @@ object WakamQuote {
       "CapitalObjetsdeValeur"               -> wakam_quote.capital_valuables,
       "Franchise"                           -> wakam_quote.deductible,
       "OptionAffairesNomades"               -> wakam_quote.nomadic_business_option,
-      "OptionSmartphone"                    -> convert_boolean_option_toString(wakam_quote.smartphone_option),
+      "OptionSmartphone"                    -> convert_boolean_to_yes_no(wakam_quote.smartphone_option),
       "OptionOrdinateur"                    -> wakam_quote.computer_option,
       "OptionDommagesElectriques"           -> wakam_quote.electrical_damage_option,
-      "OptionBrisDeGlace"                   -> convert_boolean_option_toString(wakam_quote.ice_breaker_option),
-      "OptionRCAssistanceMaternelle"        -> convert_boolean_option_toString(wakam_quote.nursery_assistant_rc_option),
-      "OptionRCAnimal"                      -> convert_boolean_option_toString(wakam_quote.animal_rc_option),
-      "OptionRCLocationDeSalle"             -> convert_boolean_option_toString(wakam_quote.room_rental_rc_option),
-      "OptionRCLocationSaisonniere"         -> convert_boolean_option_toString(wakam_quote.seasonal_rental_rc_option),
-      "OptionRCProfessionnelle"             -> convert_boolean_option_toString(wakam_quote.professional_rc_option),
-      "OptionRCMoyenDeplacementNonMotorise" -> convert_boolean_option_toString(
+      "OptionBrisDeGlace"                   -> convert_boolean_to_yes_no(wakam_quote.ice_breaker_option),
+      "OptionRCAssistanceMaternelle"        -> convert_boolean_to_yes_no(wakam_quote.nursery_assistant_rc_option),
+      "OptionRCAnimal"                      -> convert_boolean_to_yes_no(wakam_quote.animal_rc_option),
+      "OptionRCLocationDeSalle"             -> convert_boolean_to_yes_no(wakam_quote.room_rental_rc_option),
+      "OptionRCLocationSaisonniere"         -> convert_boolean_to_yes_no(wakam_quote.seasonal_rental_rc_option),
+      "OptionRCProfessionnelle"             -> convert_boolean_to_yes_no(wakam_quote.professional_rc_option),
+      "OptionRCMoyenDeplacementNonMotorise" -> convert_boolean_to_yes_no(
         wakam_quote.non_motorized_travel_rc_option
       ),
-      "OptionDommagesMaterielsPro"          -> convert_boolean_option_toString(wakam_quote.property_damage_option),
-      "OptionCapitalCoupsdursphysiques"     -> convert_boolean_option_toString(
+      "OptionDommagesMaterielsPro"          -> convert_boolean_to_yes_no(wakam_quote.property_damage_option),
+      "OptionCapitalCoupsdursphysiques"     -> convert_boolean_to_yes_no(
         wakam_quote.physical_hard_knocks_capital_option
       ),
-      "OptionProtectionJuridique"           -> convert_boolean_option_toString(wakam_quote.legal_protection_option),
-      "OptionDommagesHoteSharing"           -> convert_boolean_option_toString(wakam_quote.hotel_sharing_damage_option),
-      "OptionRCLocatairePNO"                -> convert_boolean_option_toString(wakam_quote.tenant_pno_rc_option),
-      "OptionRemplacementANeufMobilier"     -> convert_boolean_option_toString(
+      "OptionProtectionJuridique"           -> convert_boolean_to_yes_no(wakam_quote.legal_protection_option),
+      "OptionDommagesHoteSharing"           -> convert_boolean_to_yes_no(wakam_quote.hotel_sharing_damage_option),
+      "OptionRCLocatairePNO"                -> convert_boolean_to_yes_no(wakam_quote.tenant_pno_rc_option),
+      "OptionRemplacementANeufMobilier"     -> convert_boolean_to_yes_no(
         wakam_quote.new_furniture_replacement_option
       ),
-      "OptionAssuranceScolaire"             -> convert_boolean_option_toString(wakam_quote.school_insurance_option),
-      "OptionCaveAVin"                      -> convert_boolean_option_toString(wakam_quote.wine_cellar_option),
-      "Dependance"                          -> convert_boolean_option_toString(wakam_quote.dependence),
+      "OptionAssuranceScolaire"             -> convert_boolean_to_yes_no(wakam_quote.school_insurance_option),
+      "OptionCaveAVin"                      -> convert_boolean_to_yes_no(wakam_quote.wine_cellar_option),
+      "Dependance"                          -> convert_boolean_to_yes_no(wakam_quote.dependence),
       "LatitudeCommercialeDemandee"         -> wakam_quote.commercial_latitude_requested
     )
   }

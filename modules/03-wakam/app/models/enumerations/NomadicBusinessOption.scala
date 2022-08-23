@@ -3,9 +3,9 @@ package models.enumerations
 import helpers.{ Enum, EnumHelper }
 import play.api.libs.json.{ JsString, JsValue, Writes }
 
-sealed trait NomadicBusinessOption extends Product with Serializable with Enum
+private[wakam] sealed trait NomadicBusinessOption extends Product with Serializable with Enum
 
-object NomadicBusinessOption extends EnumHelper[NomadicBusinessOption] {
+private[wakam] object NomadicBusinessOption extends EnumHelper[NomadicBusinessOption] {
 
   final case object NO         extends NomadicBusinessOption { override def label(): String = "Non"        }
   final case object INDIVIDUAL extends NomadicBusinessOption { override def label(): String = "Individuel" }

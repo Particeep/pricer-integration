@@ -1,23 +1,23 @@
-package newpricer.services
+package wakam.home.services
 
 import domain.PricerResponse.Offer
 import domain._
-
 import helpers.sorus.Fail
 import helpers.sorus.SorusDSL.Sorus
-import javax.inject.{ Inject, Singleton }
-import newpricer.models.WakamResponse.{ FailureCase, SuccessCase }
-import newpricer.models.{ NewPricerConfig, WakamQuote, WakamSubscribe }
-import play.api.libs.json.{ JsError, JsSuccess, Json }
-import play.api.libs.ws.WSClient
-import play.api.{ Configuration, Logging }
-import scalaz.{ -\/, \/, \/- }
+
+import javax.inject.{Inject, Singleton}
+import wakam.home.models.WakamResponse.{FailureCase, SuccessCase}
+import wakam.home.models.{WakamConfig, WakamQuote, WakamSubscribe}
+import play.api.libs.json.{JsError, JsSuccess, Json}
+import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.{Configuration, Logging}
+import scalaz.{-\/, \/, \/-}
 import utils.NumberUtils.amountFromDoubleToCentime
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-private[newpricer] class NewPricerService @Inject() (
+private[wakam] class WakamService @Inject()(
   val ws:          WSClient,
   val config:      Configuration
 )(implicit val ec: ExecutionContext)
@@ -32,9 +32,9 @@ private[newpricer] class NewPricerService @Inject() (
    * @param config : broker authentication
    * @return
    */
-  private[newpricer] def quote(
+  private[wakam] def quote(
     request: WakamQuote,
-    config:  NewPricerConfig
+    config:  WakamConfig
   ): Future[Fail \/ PricerResponse] = {
     for {
       response <- ws.url(s"$wakam_url/getPrice").addHttpHeaders("Authorization" -> config.key).post(
@@ -66,9 +66,9 @@ private[newpricer] class NewPricerService @Inject() (
    * @param config : broker authentication
    * @param selected_quote : the result of the call to quote
    */
-  private[newpricer] def select(
+  private[wakam] def select(
     request:        WakamSubscribe,
-    config:         NewPricerConfig,
+    config:         WakamConfig,
     selected_quote: Quote
   ): Future[Fail \/ Quote] = {
     for {
