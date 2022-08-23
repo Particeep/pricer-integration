@@ -1,15 +1,16 @@
 package newpricer
 
 import domain._
+
 import helpers.sorus.Fail
 import helpers.sorus.SorusDSL.Sorus
-import newpricer.models._
+import javax.inject.{ Inject, Singleton }
+import models.{ WakamSubscribe, _ }
 import newpricer.services.NewPricerService
 import play.api.Logging
 import play.api.libs.json._
 import scalaz.\/
 
-import javax.inject.{ Inject, Singleton }
 import scala.concurrent.Future
 
 @Singleton
@@ -29,10 +30,10 @@ class NewPricer @Inject() (
     quote_input:           QuoteInput
   ): Future[Fail \/ PricerResponse] = {
     for {
-      pricer_request <- quote_input.input_json.validate[NewPricerQuoteRequest] ?| ()
-      auth           <- broker_config                                          ?| "error.broker.login.required"
-      broker_config  <- auth.validate[NewPricerConfig]                         ?| ()
-      result         <- service.quote(pricer_request, broker_config)           ?| ()
+      pricer_request <- quote_input.input_json.validate[WakamQuote]  ?| ()
+      auth           <- broker_config                                ?| "error.broker.login.required"
+      broker_config  <- auth.validate[NewPricerConfig]               ?| ()
+      result         <- service.quote(pricer_request, broker_config) ?| ()
     } yield {
       result
     }
@@ -47,7 +48,7 @@ class NewPricer @Inject() (
     subscription_input:     SelectSubscriptionInput
   ): Future[Fail \/ SelectSubscriptionOutput] = {
     for {
-      pricer_request <- subscription_input.data.validate[NewPricerSelectRequest]                         ?| ()
+      pricer_request <- subscription_input.data.validate[WakamSubscribe]                                 ?| ()
       auth           <- broker_config                                                                    ?| "error.broker.login.required"
       broker_config  <- auth.validate[NewPricerConfig]                                                   ?| ()
       updated_quote  <- service.select(pricer_request, broker_config, subscription_input.selected_quote) ?| ()
