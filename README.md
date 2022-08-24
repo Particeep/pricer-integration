@@ -64,17 +64,28 @@ And empty case class
 # InputFormat
 
 InputFormat is a schema that describes json in a way that suits our needs.
-InputFormat is a schema that describes the json input needed by the webservice. It's a static constant.
-
+InputFormat describes the json input needed by the webservice. It's a static constant.
 The building blocks are defined in the domain module
 
 * `input_format_quote` describes the json input of the `quote` endpoint
 * `input_format_select` describes the json input of the `select` endpoint, minus any fields already defined in `input_format_quote`
 
+### how does it work ?
+You can see input format like a schema and not a function. What you put in define a case class. This schema is parsed by another application and you do not have to think about it.
+For your perimeter you just have to translate into input format your case class. Case class you have to transform into input format are case class for quote and case class for select.
+
+All the data you are going to receive comes from an external server, let's call X.
+The purpose of X is to provide you with the classes you need with data in your implementation. For this he will send you the classes
+depending on how you defined the input format.
+
+Server X does not just send this, it sends you the data from the pricing (quote) in order to reuse it if necessary for the context transfer (select)
+
+As mentioned above, you are not going to dialogue with the X server, to check the input_format you can ask a developer on slack or show it during your pull request
+
+For now Server X will send you Json data.
 ## Basic structure
-
+Definition of input format is defined in module "domain" :
 ```scala
-
 case class InputFormat(
   // The name of the field, like the name of a field in an HTML form. It's the unique identifier of the field
   name:             String,
@@ -111,7 +122,20 @@ NB 1: if `is_array` is true, then the json type is an array and the elements of 
 NB 2: if `is_array` is false and `multiple` is true then this is the case where it creates a checkbox, and fields defined by data in the "option" attribute.
 
 ## Sample Code
+Let's see an example. We are going to create a class then we will see its translation into an input format, basically how
+the X server will send you the data in Json format
+```scala
 
+final case class InsuredInformation( 
+                                     civility : String,
+                                     first_name : String,
+                                     last_name : String,
+                                     birthdate : OffsetDateTime,
+                                     is_smoking : Option[Boolean]
+                                   )
+final case class Data(assures : List[InsuredInformation])
+```
+This will correspond in to this :
 ```scala
 
 val insureds_format = {
@@ -153,7 +177,7 @@ private[this] def smoker_format: InputFormat = {
 }
 
 ```
-
+cette exemple n'est pas parfait car on devrait créer un t
 # Quote endpoint
 
 You have to implement the method in `NewPricerService.quote`.
@@ -161,9 +185,9 @@ You have to implement the method in `NewPricerService.quote`.
 ```scala
 
 def quote(
-  request: NewPricerQuoteRequest,
-  config:  NewPricerConfig
-): Future[Fail \/ PricerResponse] = {
+           request: NewPricerQuoteRequest,
+           config:  NewPricerConfig
+         ): Future[Fail \/ PricerResponse] = {
   ???
 }
 
@@ -238,12 +262,12 @@ You can ignore `URL`
 
 ```scala
 case class Meta(
-  title:       Option[String]             = None,
-  sub_title:   Option[String]             = None,
-  description: Option[String]             = None,
-  documents:   Option[List[MetaDocument]] = None,
-  args:        Map[String, List[String]]  = Map.empty
-)
+                 title:       Option[String]             = None,
+                 sub_title:   Option[String]             = None,
+                 description: Option[String]             = None,
+                 documents:   Option[List[MetaDocument]] = None,
+                 args:        Map[String, List[String]]  = Map.empty
+               )
 ```
 
 Typically, you will use the title and description. You will use the rest of the attributes if we tell you to.
@@ -281,22 +305,22 @@ val meta : Meta = Meta(
 ```scala
 
 case class Offer(
-  // the price returned by the insurer
-  price:         Price,
+                  // the price returned by the insurer
+                  price:         Price,
 
-  // a list of items related to insurance coverage
-  detail:        List[OfferItem]      = List(),
+                  // a list of items related to insurance coverage
+                  detail:        List[OfferItem]      = List(),
 
-  // custom & complex data to display, such as payment schedule
-  // you don't need it, just use default value
-  internal_data: Option[InternalData] = None,
+                  // custom & complex data to display, such as payment schedule
+                  // you don't need it, just use default value
+                  internal_data: Option[InternalData] = None,
 
-  // data to carry to other requests on external pricer, explained below
-  external_data: Option[JsObject]     = None,
+                  // data to carry to other requests on external pricer, explained below
+                  external_data: Option[JsObject]     = None,
 
-  // marketing data about the offer
-  meta:          Option[Meta]         = None
-) extends PricerResponse
+                  // marketing data about the offer
+                  meta:          Option[Meta]         = None
+                ) extends PricerResponse
 
 ```
 
@@ -311,13 +335,13 @@ You are free to decide on the JSON structure. `external_data` will be passed ide
 ```scala
 
 case class Price(
-  amount_ht:   Amount,
-  owner_fees:  Amount    = Amount(0),
-  broker_fees: Amount    = Amount(0),
-  taxes:       Amount    = Amount(0),
-  currency:    Currency  = Currency.getInstance("EUR"),
-  frequency:   Frequency = Frequency.ONCE
-)
+                  amount_ht:   Amount,
+                  owner_fees:  Amount    = Amount(0),
+                  broker_fees: Amount    = Amount(0),
+                  taxes:       Amount    = Amount(0),
+                  currency:    Currency  = Currency.getInstance("EUR"),
+                  frequency:   Frequency = Frequency.ONCE
+                )
 
 ```
 
@@ -332,11 +356,11 @@ If the web service does not give you all the fields, use the default values.
 ```scala
 
 case class OfferItem(
-  label: String,
-  value: String,
-  kind: String,
-  args: List[String] = List.empty
-)
+                      label: String,
+                      value: String,
+                      kind: String,
+                      args: List[String] = List.empty
+                    )
 
 ```
 
@@ -365,15 +389,15 @@ You have to implement the method in `NewPricerService.select`
 ```scala
 
 private[newpricer] def select(
-  // same structure as request: NewPricerQuoteRequest but with more data
-  request:        NewPricerSelectRequest,
+                               // same structure as request: NewPricerQuoteRequest but with more data
+                               request:        NewPricerSelectRequest,
 
-  // broker authentication
-  config:         NewPricerConfig,
+                               // broker authentication
+                               config:         NewPricerConfig,
 
-  // the result of the quote endpoint
-  selected_quote: Quote
-): Future[Fail \/ Quote] = {
+                               // the result of the quote endpoint
+                               selected_quote: Quote
+                             ): Future[Fail \/ Quote] = {
   ???
 }
 
