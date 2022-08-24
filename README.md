@@ -177,7 +177,6 @@ private[this] def smoker_format: InputFormat = {
 }
 
 ```
-cette exemple n'est pas parfait car on devrait créer un t
 # Quote endpoint
 
 You have to implement the method in `NewPricerService.quote`.
