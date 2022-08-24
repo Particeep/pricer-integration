@@ -135,7 +135,7 @@ final case class InsuredInformation(
                                    )
 final case class Data(assures : List[InsuredInformation])
 ```
-This will correspond in to this :
+This will correspond into this :
 ```scala
 
 val insureds_format = {
@@ -177,6 +177,28 @@ private[this] def smoker_format: InputFormat = {
 }
 
 ```
+when the server X sends you data, it will be in json. If the input format matches the class cases you created, doing a json.as should work
+````json
+val data_from_server_x : JsValue = {
+  "assures" : [ {
+    "civility" : "MR",
+    "first_name" : "Patrick",
+    "last_name" : "smile",
+    "birthdate" : "2002-08-24T07:52:54Z",
+    "is_smoking" : true
+  }, {
+    "civility" : "MME",
+    "first_name" : "Sofia",
+    "last_name" : "smile",
+    "birthdate" : "1992-08-24T07:52:54Z",
+    "is_smoking" : false
+  } ]
+}
+
+val data_parser : Data = data_from_server_x.as[Data]
+````
+this is an example, actually you are not allowed to use ".as" because of side effects, you should use ".validate" with Sorus.
+
 # Quote endpoint
 
 You have to implement the method in `NewPricerService.quote`.
