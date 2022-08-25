@@ -74,17 +74,18 @@ The building blocks are defined in the domain module
 You can see input format like a schema and not a function. What you put in define a case class. This schema is parsed by another application and you do not have to think about it.
 For your perimeter you just have to translate into input format your case class. Case class you have to transform into input format are case class for quote and case class for select.
 
-All the data you are going to receive comes from an external server, let's call X.
-The purpose of X is to provide you with the classes you need with data in your implementation. For this he will send you the classes
-depending on how you defined the input format.
+All the data you are going to receive comes from an external server, let's call it X.
+the purpose of the server x  is to send you the JSON-formatted representation of your classes. 
+Therefore, it will suffice to use play json to transform the JSON into the format of the expected class  
+For this it will send you the JSON depending on how you defined the input format.
 
 Server X does not just send this, it sends you the data from the pricing (quote) in order to reuse it if necessary for the context transfer (select)
 
-As mentioned above, you are not going to dialogue with the X server, to check the input_format you can ask a developer on slack or show it during your pull request
+As mentioned above, you are not going to dialogue with the server X, to check the input_format you have to do a unit test that takes a json as input 
+and sees if by transforming the json into the expected class there is no problem
 
-For now Server X will send you Json data.
 ## Basic structure
-Definition of input format is defined in module "domain" :
+Input format is defined in module "domain" :
 ```scala
 case class InputFormat(
   // The name of the field, like the name of a field in an HTML form. It's the unique identifier of the field
@@ -177,8 +178,8 @@ private[this] def smoker_format: InputFormat = {
 }
 
 ```
-when the server X sends you data, it will be in json. If the input format matches the class cases you created, doing a json.as should work
-````json
+when the server X sends you data, it will be in json. If the input format matches the cases class you created, doing a json.validate with Sorus should work
+````scala
 val data_from_server_x : JsValue = {
   "assures" : [ {
     "civility" : "MR",
@@ -195,7 +196,12 @@ val data_from_server_x : JsValue = {
   } ]
 }
 
-val data_parser : Data = data_from_server_x.as[Data]
+for {
+  value : Data <- data_from_server_x.validate[Data] ?| "error during parsing"
+    ???
+}yield {
+  ???
+}
 ````
 this is an example, actually you are not allowed to use ".as" because of side effects, you should use ".validate" with Sorus.
 
@@ -459,6 +465,7 @@ For more detail, see this article : https://medium.com/@adriencrovetto/error-han
 * enforce encapsulation as much as possible, e.g. use private[newpricer] except for the three methods implemented by `PricerService`. Use private[this] if needed.
 * run `sbt scalastyle` and clean up the warning
 * run `sbt fmt` and format the code
+* no `.as`, `asInstanceOf`or all types of method which break immutable principe
 
 # error management and log
 
