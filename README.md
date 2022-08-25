@@ -333,15 +333,19 @@ val meta : Meta = Meta(
 case class Offer(
   // the price returned by the insurer
   price:         Price,
-   // a list of items related to insurance coverage
-   detail:        List[OfferItem]      = List(),
-   // custom & complex data to display, such as payment schedule
-   // you don't need it, just use default value
-   internal_data: Option[InternalData] = None,
-   // data to carry to other requests on external pricer, explained below
-   external_data: Option[JsObject]     = None,
-    // marketing data about the offer
-    meta:          Option[Meta]         = None
+
+  // a list of items related to insurance coverage
+  detail:        List[OfferItem]      = List(),
+
+  // custom & complex data to display, such as payment schedule
+  // you don't need it, just use default value
+  internal_data: Option[InternalData] = None,
+
+  // data to carry to other requests on external pricer, explained below
+  external_data: Option[JsObject]     = None,
+
+  // marketing data about the offer
+  meta:          Option[Meta]         = None
 ) extends PricerResponse
 
 ```
@@ -413,11 +417,13 @@ You have to implement the method in `NewPricerService.select`
 private[newpricer] def select(
   // same structure as request: NewPricerQuoteRequest but with more data
   request:        NewPricerSelectRequest,
+
   // broker authentication
   config:         NewPricerConfig,
+
   // the result of the quote endpoint
   selected_quote: Quote
-  ): Future[Fail \/ Quote] = {
+): Future[Fail \/ Quote] = {
   ???
 }
 
