@@ -3,7 +3,7 @@ package wakam.home.models
 import domain.FieldType.{ BOOLEAN, DATE, ENUM, NUMBER, OBJECT, TEXT }
 import domain.InputFormat
 
-import models.enumerations._
+import wakam.home.models.enumerations._
 
 private[wakam] object InputFormatFactory {
 

@@ -1,4 +1,4 @@
-package models.enumerations
+package wakam.home.models.enumerations
 
 import helpers.{ Enum, EnumHelper }
 import play.api.libs.json.{ JsString, JsValue, Writes }

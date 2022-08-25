@@ -4,8 +4,8 @@ import domain._
 import helpers.sorus.Fail
 import helpers.sorus.SorusDSL.Sorus
 
-import javax.inject.{Inject, Singleton}
-import models.{WakamSubscribe, _}
+import javax.inject.{ Inject, Singleton }
+import models.{ WakamSubscribe, _ }
 import wakam.home.services.WakamService
 import play.api.Logging
 import play.api.libs.json._
@@ -14,7 +14,7 @@ import scalaz.\/
 import scala.concurrent.Future
 
 @Singleton
-class WakamHome @Inject()(
+class WakamHome @Inject() (
   service: WakamService
 ) extends PricerService
     with Sorus
@@ -26,13 +26,13 @@ class WakamHome @Inject()(
   }
 
   override def quote(broker_config: Option[JsValue])(
-    pricer_id:             String,
-    quote_input:           QuoteInput
+    pricer_id:                      String,
+    quote_input:                    QuoteInput
   ): Future[Fail \/ PricerResponse] = {
     for {
       pricer_request <- quote_input.input_json.validate[WakamQuote]  ?| ()
       auth           <- broker_config                                ?| "error.broker.login.required"
-      broker_config  <- auth.validate[WakamConfig]               ?| ()
+      broker_config  <- auth.validate[WakamConfig]                   ?| ()
       result         <- service.quote(pricer_request, broker_config) ?| ()
     } yield {
       result
@@ -44,13 +44,13 @@ class WakamHome @Inject()(
   }
 
   override def select(broker_config: Option[JsValue])(
-    pricer_id:              String,
-    subscription_input:     SelectSubscriptionInput
+    pricer_id:                       String,
+    subscription_input:              SelectSubscriptionInput
   ): Future[Fail \/ SelectSubscriptionOutput] = {
     for {
       pricer_request <- subscription_input.data.validate[WakamSubscribe]                                 ?| ()
       auth           <- broker_config                                                                    ?| "error.broker.login.required"
-      broker_config  <- auth.validate[WakamConfig]                                                   ?| ()
+      broker_config  <- auth.validate[WakamConfig]                                                       ?| ()
       updated_quote  <- service.select(pricer_request, broker_config, subscription_input.selected_quote) ?| ()
     } yield {
       SelectSubscriptionOutput("200", updated_quote)
