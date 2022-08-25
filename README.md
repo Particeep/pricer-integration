@@ -130,9 +130,9 @@ the X server will send you the data in Json format
 final case class InsuredInformation( 
   civility : String,
   first_name : String,
-   last_name : String,
-   birthdate : OffsetDateTime,
-   s_smoking : Option[Boolean]
+  last_name : String,
+  birthdate : OffsetDateTime,
+  s_smoking : Option[Boolean]
 )
 final case class Data(assures : List[InsuredInformation])
 ```
