@@ -128,12 +128,12 @@ the X server will send you the data in Json format
 ```scala
 
 final case class InsuredInformation( 
-                                     civility : String,
-                                     first_name : String,
-                                     last_name : String,
-                                     birthdate : OffsetDateTime,
-                                     is_smoking : Option[Boolean]
-                                   )
+  civility : String,
+  first_name : String,
+   last_name : String,
+   birthdate : OffsetDateTime,
+   s_smoking : Option[Boolean]
+)
 final case class Data(assures : List[InsuredInformation])
 ```
 This will correspond into this :
@@ -211,9 +211,9 @@ You have to implement the method in `NewPricerService.quote`.
 ```scala
 
 def quote(
-           request: NewPricerQuoteRequest,
-           config:  NewPricerConfig
-         ): Future[Fail \/ PricerResponse] = {
+  request: NewPricerQuoteRequest,
+  config:  NewPricerConfig
+): Future[Fail \/ PricerResponse] = {
   ???
 }
 
@@ -288,12 +288,12 @@ You can ignore `URL`
 
 ```scala
 case class Meta(
-                 title:       Option[String]             = None,
-                 sub_title:   Option[String]             = None,
-                 description: Option[String]             = None,
-                 documents:   Option[List[MetaDocument]] = None,
-                 args:        Map[String, List[String]]  = Map.empty
-               )
+  title:       Option[String]             = None,
+  sub_title:   Option[String]             = None,
+  description: Option[String]             = None,
+  documents:   Option[List[MetaDocument]] = None,
+  args:        Map[String, List[String]]  = Map.empty
+)
 ```
 
 Typically, you will use the title and description. You will use the rest of the attributes if we tell you to.
@@ -331,22 +331,18 @@ val meta : Meta = Meta(
 ```scala
 
 case class Offer(
-                  // the price returned by the insurer
-                  price:         Price,
-
-                  // a list of items related to insurance coverage
-                  detail:        List[OfferItem]      = List(),
-
-                  // custom & complex data to display, such as payment schedule
-                  // you don't need it, just use default value
-                  internal_data: Option[InternalData] = None,
-
-                  // data to carry to other requests on external pricer, explained below
-                  external_data: Option[JsObject]     = None,
-
-                  // marketing data about the offer
-                  meta:          Option[Meta]         = None
-                ) extends PricerResponse
+  // the price returned by the insurer
+  price:         Price,
+   // a list of items related to insurance coverage
+   detail:        List[OfferItem]      = List(),
+   // custom & complex data to display, such as payment schedule
+   // you don't need it, just use default value
+   internal_data: Option[InternalData] = None,
+   // data to carry to other requests on external pricer, explained below
+   external_data: Option[JsObject]     = None,
+    // marketing data about the offer
+    meta:          Option[Meta]         = None
+) extends PricerResponse
 
 ```
 
@@ -361,13 +357,13 @@ You are free to decide on the JSON structure. `external_data` will be passed ide
 ```scala
 
 case class Price(
-                  amount_ht:   Amount,
-                  owner_fees:  Amount    = Amount(0),
-                  broker_fees: Amount    = Amount(0),
-                  taxes:       Amount    = Amount(0),
-                  currency:    Currency  = Currency.getInstance("EUR"),
-                  frequency:   Frequency = Frequency.ONCE
-                )
+  amount_ht:   Amount,
+  owner_fees:  Amount    = Amount(0),
+  broker_fees: Amount    = Amount(0),
+  taxes:       Amount    = Amount(0),
+  currency:    Currency  = Currency.getInstance("EUR"),
+  frequency:   Frequency = Frequency.ONCE
+)
 
 ```
 
@@ -382,11 +378,11 @@ If the web service does not give you all the fields, use the default values.
 ```scala
 
 case class OfferItem(
-                      label: String,
-                      value: String,
-                      kind: String,
-                      args: List[String] = List.empty
-                    )
+  label: String,
+  value: String,
+  kind: String,
+  args: List[String] = List.empty
+)
 
 ```
 
@@ -415,15 +411,13 @@ You have to implement the method in `NewPricerService.select`
 ```scala
 
 private[newpricer] def select(
-                               // same structure as request: NewPricerQuoteRequest but with more data
-                               request:        NewPricerSelectRequest,
-
-                               // broker authentication
-                               config:         NewPricerConfig,
-
-                               // the result of the quote endpoint
-                               selected_quote: Quote
-                             ): Future[Fail \/ Quote] = {
+  // same structure as request: NewPricerQuoteRequest but with more data
+  request:        NewPricerSelectRequest,
+  // broker authentication
+  config:         NewPricerConfig,
+  // the result of the quote endpoint
+  selected_quote: Quote
+  ): Future[Fail \/ Quote] = {
   ???
 }
 
@@ -464,7 +458,8 @@ For more detail, see this article : https://medium.com/@adriencrovetto/error-han
 * enforce encapsulation as much as possible, e.g. use private[newpricer] except for the three methods implemented by `PricerService`. Use private[this] if needed.
 * run `sbt scalastyle` and clean up the warning
 * run `sbt fmt` and format the code
-* no `.as`, `asInstanceOf`or all types of method which break immutable principe
+* no `.as` use `.validate`
+* no `asInstanceOf`or all types of method which break immutable principe
 
 # error management and log
 
