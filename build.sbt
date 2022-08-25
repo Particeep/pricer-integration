@@ -26,6 +26,7 @@ lazy val domain: Project     = (project in file("modules/02-domain"))
   .dependsOn(core % "test->test;compile->compile")
 
 lazy val wakam: Project = (project in file("modules/03-wakam"))
+  .enablePlugins(PlayScala)
   .settings(commonPlaySettings: _*)
   .dependsOn(core % "test->test;compile->compile", domain)
 
