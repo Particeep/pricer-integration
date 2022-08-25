@@ -203,7 +203,6 @@ for {
   ???
 }
 ````
-this is an example, actually you are not allowed to use ".as" because of side effects, you should use ".validate" with Sorus.
 
 # Quote endpoint
 
