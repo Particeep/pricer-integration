@@ -2,7 +2,7 @@ package wakam.home.models
 
 import ai.x.play.json.Encoders.encoder
 import ai.x.play.json.Jsonx
-import play.api.libs.json.{ JsValue, Json, OFormat, Writes }
+import play.api.libs.json.{ JsValue, Json, OFormat, Reads, Writes }
 
 import java.time.OffsetDateTime
 
@@ -26,7 +26,7 @@ private[wakam] final case class WakamSubscribe(
   address:                           String,
   municipality:                      String,
   postal_code:                       String,
-  beneficiaries:                     String,
+  beneficiaries:                     List[Beneficiaries],
   date_of_birth:                     OffsetDateTime,
   said_place:                        String,
   channel_name:                      String,
@@ -37,6 +37,13 @@ private[wakam] final case class WakamSubscribe(
   previous_insurer:                  String,
   previous_policy_number:            String,
   previous_policy_subscription_date: OffsetDateTime
+)
+private[wakam] case class Beneficiaries(
+  kind:          String,
+  title:         String,
+  last_name:     String,
+  first_name:    String,
+  date_of_birth: OffsetDateTime
 )
 
 private[wakam] object WakamSubscribe {
@@ -61,7 +68,7 @@ private[wakam] object WakamSubscribe {
       "Adresse"                          -> wakam_subscribe.address,
       "Commune"                          -> wakam_subscribe.municipality,
       "CodePostal"                       -> wakam_subscribe.postal_code,
-      "Beneficiaires"                    -> wakam_subscribe.beneficiaries,
+      "Beneficiaires"                    -> Json.toJson(wakam_subscribe.beneficiaries),
       "DateDeNaissance"                  -> wakam_subscribe.date_of_birth,
       "LieuDit"                          -> wakam_subscribe.said_place,
       "NomVoie"                          -> wakam_subscribe.channel_name,
@@ -75,4 +82,17 @@ private[wakam] object WakamSubscribe {
     )
   }
   implicit val wakam_subscribe_read: OFormat[WakamSubscribe] = Jsonx.formatCaseClass[WakamSubscribe]
+}
+
+private[wakam] object Beneficiaries {
+  implicit val beneficiaries_read: Reads[Beneficiaries]   = Json.reads[Beneficiaries]
+  implicit val beneficiaries_write: Writes[Beneficiaries] = new Writes[Beneficiaries] {
+    override def writes(o: Beneficiaries): JsValue = Json.obj(
+      "Type"            -> o.kind,
+      "Titre"           -> o.title,
+      "Nom"             -> o.last_name,
+      "Prenom"          -> o.first_name,
+      "DateDeNaissance" -> o.date_of_birth.toString
+    )
+  }
 }

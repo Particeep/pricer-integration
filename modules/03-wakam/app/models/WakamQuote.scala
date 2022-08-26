@@ -41,7 +41,7 @@ private[wakam] final case class WakamQuote(
 
 private[wakam] object WakamQuote {
   private[this] def convert_boolean_to_yes_no(option: Boolean): String = {
-    if(option) "Yes" else "No"
+    if(option) "Oui" else "Non"
   }
   implicit val wakam_quote_write: Writes[WakamQuote]   = new Writes[WakamQuote] {
     override def writes(wakam_quote: WakamQuote): JsValue = Json.obj(

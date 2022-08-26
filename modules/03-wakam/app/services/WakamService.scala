@@ -31,7 +31,7 @@ private[wakam] class WakamService @Inject() (
     response.status match {
       case 200 => response.json.validate[SuccessCase] match {
           case JsSuccess(value, _) => \/-(Offer(
-              Price(Amount(amountFromDoubleToCentime(value.MontantTotalPrimeTTC / 12))),
+              Price(Amount(amountFromDoubleToCentime(value.MontantTotalPrimeTTC.toDouble / 12))),
               external_data = Some(Json.obj("quote_reference" -> value.QuoteReference))
             ))
           case JsError(errors)     => -\/(Fail(
@@ -68,9 +68,8 @@ private[wakam] class WakamService @Inject() (
     request: WakamQuote,
     config:  WakamConfig
   ): Future[Fail \/ PricerResponse] = {
-    println(request)
     for {
-      response <- ws.url(s"$wakam_url/getPrice").addHttpHeaders("Authorization" -> config.key).post(
+      response <- ws.url(s"$wakam_url/getPrice").addHttpHeaders("Ocp-Apim-Subscription-Key" -> config.key).post(
                     Json.toJson(request)(WakamQuote.wakam_quote_write)
                   ) ?| ()
       offer    <- parse_wakam_quote_response(response) ?| ()
