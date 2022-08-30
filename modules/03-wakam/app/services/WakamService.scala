@@ -7,7 +7,7 @@ import helpers.sorus.SorusDSL.Sorus
 
 import javax.inject.{ Inject, Singleton }
 import wakam.home.models.WakamResponse.{ FailureCase, SuccessCase }
-import wakam.home.models.{ WakamConfig, WakamQuote, WakamSubscribe }
+import wakam.home.models.{ WakamConfig, WakamQuote, WakamSelectConfig, WakamSubscribe }
 import play.api.libs.json.{ JsError, JsSuccess, Json }
 import play.api.libs.ws.{ WSClient, WSResponse }
 import play.api.{ Configuration, Logging }
@@ -85,11 +85,14 @@ private[wakam] class WakamService @Inject() (
    */
   private[wakam] def select(
     request:        WakamSubscribe,
-    config:         WakamConfig,
+    config:         WakamSelectConfig,
     selected_quote: Quote
   ): Future[Fail \/ Quote] = {
     for {
-      response <- ws.url(s"$wakam_url/subscribe").addHttpHeaders("Authorization" -> config.key).post(
+      response <- ws.url(s"$wakam_url/subscribe").addHttpHeaders(
+                    "Ocp-Apim-Subscription-Key" -> config.key,
+                    "PartnershipCode"           -> config.partnership_code
+                  ).post(
                     Json.toJson(request)(WakamSubscribe.wakam_subscribe_write)
                   ) ?| ()
       quote    <- parse_wakam_select_response(response, selected_quote) ?| ()

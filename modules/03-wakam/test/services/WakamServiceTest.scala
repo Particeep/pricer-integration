@@ -5,7 +5,7 @@ import domain.{ Amount, Price, PricerResponse, Quote }
 import domain.PricerResponse.Offer
 import helpers.sorus.Fail
 import org.scalatestplus.play.PlaySpec
-import wakam.home.models.{ WakamConfig, WakamQuote, WakamSubscribe }
+import wakam.home.models.{ WakamConfig, WakamQuote, WakamSelectConfig, WakamSubscribe }
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
 import play.api.Configuration
 import play.api.libs.ws.WSClient
@@ -56,6 +56,8 @@ class WakamServiceTest extends PlaySpec with GuiceOneServerPerTest with TestHelp
   private[this] val config: Config               = ConfigFactory.load("reference.conf")
   private[this] val configuration: Configuration = Configuration(config)
   private[this] val wakam_config: WakamConfig    = WakamConfig(key = "68392ddb6dab406aa0fd785459f0b298")
+  private[this] val wakam_select_config          =
+    WakamSelectConfig(key = "f094572ee63a4622a4e8dc294a44f52c", partnership_code = "2666080601")
   val date_formatter: DateTimeFormatter          = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
   private[this] val wakam_select   = WakamSubscribe(
@@ -95,7 +97,8 @@ class WakamServiceTest extends PlaySpec with GuiceOneServerPerTest with TestHelp
   "WakamService" should {
     "return offer on sending valid quote" in {
       val ws: WSClient                     = app.injector.instanceOf[WSClient]
-      val wakam_service: WakamService      = new WakamService(ws = ws, config = configuration)
+      val wakam_service: WakamService      =
+        new WakamService(ws = ws, config = configuration)
       val response: Fail \/ PricerResponse = await(wakam_service.quote(wakam_quote, wakam_config))
       response.fold(
         fail => fail,
@@ -109,7 +112,8 @@ class WakamServiceTest extends PlaySpec with GuiceOneServerPerTest with TestHelp
     "return failure with invalid quote data" in {
       val new_quote                        = wakam_quote.copy(postal_code = "1")
       val ws: WSClient                     = app.injector.instanceOf[WSClient]
-      val wakam_service: WakamService      = new WakamService(ws = ws, config = configuration)
+      val wakam_service: WakamService      =
+        new WakamService(ws = ws, config = configuration)
       val response: Fail \/ PricerResponse = await(wakam_service.quote(new_quote, wakam_config))
       response.fold(
         fail => {
@@ -122,7 +126,8 @@ class WakamServiceTest extends PlaySpec with GuiceOneServerPerTest with TestHelp
     "return failure with missing quote data" in {
       val new_quote                        = wakam_quote.copy(postal_code = "")
       val ws: WSClient                     = app.injector.instanceOf[WSClient]
-      val wakam_service: WakamService      = new WakamService(ws = ws, config = configuration)
+      val wakam_service: WakamService      =
+        new WakamService(ws = ws, config = configuration)
       val response: Fail \/ PricerResponse = await(wakam_service.quote(new_quote, wakam_config))
       response.fold(
         fail => {
@@ -131,11 +136,30 @@ class WakamServiceTest extends PlaySpec with GuiceOneServerPerTest with TestHelp
         result => result
       )
     }
-
+    // ignore
     "return selected quote with valid selection" in {
       val ws: WSClient                = app.injector.instanceOf[WSClient]
-      val wakam_service: WakamService = new WakamService(ws = ws, config = configuration)
-      val response                    = await(wakam_service.select(wakam_select, wakam_config, selected_quote))
+      val wakam_service: WakamService =
+        new WakamService(ws = ws, config = configuration)
+      val response                    = await(wakam_service.select(wakam_select, wakam_select_config, selected_quote))
+      response.fold(
+        fail => println(s"error in response: ${fail.message}"),
+        quote => quote.response.price mustBe (offer_data.price)
+      )
+
+    }
+    // ignore
+    "return selected quote with missing selection data" in {
+      val ws: WSClient                = app.injector.instanceOf[WSClient]
+      val new_selection               = wakam_select.copy(quote_reference = "")
+      val wakam_service: WakamService =
+        new WakamService(ws = ws, config = configuration)
+      val response                    = await(wakam_service.select(wakam_select, wakam_select_config, selected_quote))
+      response.fold(
+        fail => fail.message mustBe ("Unprocessable entity"),
+        quote => quote
+      )
+
     }
   }
 

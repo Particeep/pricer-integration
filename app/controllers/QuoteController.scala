@@ -42,9 +42,9 @@ class QuoteController @Inject() (
 
   def select(pricer_id: String): Action[JsValue] = Action.sorus(parse.json) { implicit request =>
     for {
-      input  <- request.body.validate[SelectSubscriptionInput] ?| ()
-      pricer <- pricer_factory.build(pricer_id)                ?| ()
-      result <- pricer.select(broker_config)(pricer_id, input) ?| ()
+      input  <- request.body.validate[SelectSubscriptionInput]       ?| ()
+      pricer <- pricer_factory.build(pricer_id)                      ?| ()
+      result <- pricer.select(wakam_select_config)(pricer_id, input) ?| ()
     } yield {
       Ok(Json.toJson(result))
     }
@@ -54,5 +54,6 @@ class QuoteController @Inject() (
    * This is custom json used to store broker configuration
    * Like API key / secret
    */
-  private[this] val broker_config = Some(Json.parse("""{}"""))
+  private[this] val broker_config       = Some(Json.parse("""{}"""))
+  private[this] val wakam_select_config = Some(Json.parse("""{}"""))
 }

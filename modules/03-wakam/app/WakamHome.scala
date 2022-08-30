@@ -50,7 +50,7 @@ class WakamHome @Inject() (
     for {
       pricer_request <- subscription_input.data.validate[WakamSubscribe]                                 ?| ()
       auth           <- broker_config                                                                    ?| "error.broker.login.required"
-      broker_config  <- auth.validate[WakamConfig]                                                       ?| ()
+      broker_config  <- auth.validate[WakamSelectConfig]                                                 ?| ()
       updated_quote  <- service.select(pricer_request, broker_config, subscription_input.selected_quote) ?| ()
     } yield {
       SelectSubscriptionOutput("200", updated_quote)
