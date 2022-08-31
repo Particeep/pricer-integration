@@ -21,6 +21,6 @@ class PricerFactory @Inject() (
   }
 
   private[this] val all_pricers = Map(
-    "new_pricer_9837778b-46b8-412b-a0c8-c3c478c0fda5" -> wakam_home
+    "wakam_home_3c25657e-2952-11ed-a261-0242ac120002" -> wakam_home
   )
 }
