@@ -1,9 +1,5 @@
 package wakam.home.models
 
-import ai.x.play.json.Encoders.encoder
-import ai.x.play.json.Jsonx
-import play.api.libs.json.{ JsValue, Json, OFormat, Reads, Writes }
-
 import java.time.OffsetDateTime
 
 private[wakam] final case class WakamSubscribe(
@@ -45,54 +41,3 @@ private[wakam] case class Beneficiaries(
   first_name:    String,
   date_of_birth: OffsetDateTime
 )
-
-private[wakam] object WakamSubscribe {
-  implicit val wakam_subscribe_write: Writes[WakamSubscribe] = new Writes[WakamSubscribe] {
-    override def writes(wakam_subscribe: WakamSubscribe): JsValue = Json.obj(
-      "QuoteReference"                   -> wakam_subscribe.quote_reference,
-      "ReferenceClient"                  -> wakam_subscribe.reference_client,
-      "DateDebutEffet"                   -> wakam_subscribe.start_date_effect,
-      "DateFinEffet"                     -> wakam_subscribe.end_date_effect,
-      "Fractionnement"                   -> wakam_subscribe.split_payment,
-      "DatePremiereEcheance"             -> wakam_subscribe.first_due_date,
-      "Nom"                              -> wakam_subscribe.last_name,
-      "Prenom"                           -> wakam_subscribe.first_name,
-      "Titre"                            -> wakam_subscribe.title,
-      "Email"                            -> wakam_subscribe.email,
-      "Iban"                             -> wakam_subscribe.iban,
-      "Bic"                              -> wakam_subscribe.bic,
-      "CodeBanque"                       -> wakam_subscribe.bank_code,
-      "NomBanque"                        -> wakam_subscribe.bank_name,
-      "Titulaire"                        -> wakam_subscribe.holder,
-      "NumeroMobile"                     -> wakam_subscribe.mobile_number,
-      "Adresse"                          -> wakam_subscribe.address,
-      "Commune"                          -> wakam_subscribe.municipality,
-      "CodePostal"                       -> wakam_subscribe.postal_code,
-      "Beneficiaires"                    -> Json.toJson(wakam_subscribe.beneficiaries),
-      "DateDeNaissance"                  -> wakam_subscribe.date_of_birth,
-      "LieuDit"                          -> wakam_subscribe.said_place,
-      "NomVoie"                          -> wakam_subscribe.channel_name,
-      "NumeroVoie"                       -> wakam_subscribe.channel_number,
-      "Qualite"                          -> wakam_subscribe.quality,
-      "NumeroPaiement"                   -> wakam_subscribe.payment_number,
-      "MontantPaiement"                  -> wakam_subscribe.payment_amount,
-      "AssureurPrecedent"                -> wakam_subscribe.previous_insurer,
-      "NumeroPolicePrecedent"            -> wakam_subscribe.previous_policy_number,
-      "DateSouscriptionPolicePrecedente" -> wakam_subscribe.previous_policy_subscription_date
-    )
-  }
-  implicit val wakam_subscribe_read: OFormat[WakamSubscribe] = Jsonx.formatCaseClass[WakamSubscribe]
-}
-
-private[wakam] object Beneficiaries {
-  implicit val beneficiaries_read: Reads[Beneficiaries]   = Json.reads[Beneficiaries]
-  implicit val beneficiaries_write: Writes[Beneficiaries] = new Writes[Beneficiaries] {
-    override def writes(o: Beneficiaries): JsValue = Json.obj(
-      "Type"            -> o.kind,
-      "Titre"           -> o.title,
-      "Nom"             -> o.last_name,
-      "Prenom"          -> o.first_name,
-      "DateDeNaissance" -> o.date_of_birth.toString
-    )
-  }
-}

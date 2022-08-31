@@ -1,15 +1,15 @@
 package wakam.home
 
 import domain._
+
 import helpers.sorus.Fail
 import helpers.sorus.SorusDSL.Sorus
-
 import javax.inject.{ Inject, Singleton }
 import models.{ WakamSubscribe, _ }
-import wakam.home.services.WakamService
 import play.api.Logging
 import play.api.libs.json._
 import scalaz.\/
+import wakam.home.services.WakamService
 
 import scala.concurrent.Future
 
@@ -25,14 +25,14 @@ class WakamHome @Inject() (
     InputFormatFactory.input_format_quote
   }
 
-  override def quote(broker_config: Option[JsValue])(
-    pricer_id:                      String,
-    quote_input:                    QuoteInput
+  override def quote(wakam_quote_config: Option[JsValue])(
+    pricer_id:                           String,
+    quote_input:                         QuoteInput
   ): Future[Fail \/ PricerResponse] = {
     for {
       pricer_request <- quote_input.input_json.validate[WakamQuote]  ?| ()
-      auth           <- broker_config                                ?| "error.broker.login.required"
-      broker_config  <- auth.validate[WakamConfig]                   ?| ()
+      auth           <- wakam_quote_config                           ?| "error.broker.login.required"
+      broker_config  <- auth.validate[WakamQuoteConfig]              ?| ()
       result         <- service.quote(pricer_request, broker_config) ?| ()
     } yield {
       result
@@ -43,13 +43,13 @@ class WakamHome @Inject() (
     InputFormatFactory.input_format_select
   }
 
-  override def select(broker_config: Option[JsValue])(
-    pricer_id:                       String,
-    subscription_input:              SelectSubscriptionInput
+  override def select(wakam_select_config: Option[JsValue])(
+    pricer_id:                             String,
+    subscription_input:                    SelectSubscriptionInput
   ): Future[Fail \/ SelectSubscriptionOutput] = {
     for {
       pricer_request <- subscription_input.data.validate[WakamSubscribe]                                 ?| ()
-      auth           <- broker_config                                                                    ?| "error.broker.login.required"
+      auth           <- wakam_select_config                                                              ?| "error.broker.login.required"
       broker_config  <- auth.validate[WakamSelectConfig]                                                 ?| ()
       updated_quote  <- service.select(pricer_request, broker_config, subscription_input.selected_quote) ?| ()
     } yield {

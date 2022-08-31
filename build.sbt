@@ -21,16 +21,16 @@ lazy val core: Project = (project in file("modules/01-core")).enablePlugins(Play
   .settings(commonPlaySettings: _*)
   .settings(aggregateReverseRoutes := Seq(root))
 
-lazy val domain: Project     = (project in file("modules/02-domain"))
+lazy val domain: Project = (project in file("modules/02-domain"))
   .settings(commonSettings: _*)
   .dependsOn(core % "test->test;compile->compile")
 
-lazy val wakam: Project = (project in file("modules/03-wakam"))
+lazy val wakam: Project  = (project in file("modules/03-wakam"))
   .enablePlugins(PlayScala)
   .settings(commonPlaySettings: _*)
   .dependsOn(core % "test->test;compile->compile", domain)
 
-lazy val root: Project       = (project in file("."))
+lazy val root: Project   = (project in file("."))
   .enablePlugins(PlayScala)
   .settings(commonPlaySettings: _*)
   .aggregate(

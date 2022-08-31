@@ -32,8 +32,8 @@ class QuoteController @Inject() (
     val input = QuoteInput(request.body)
     val lang  = request.headers.get("lang").getOrElse("fr")
     for {
-      pricer <- pricer_factory.build(pricer_id)               ?| ()
-      result <- pricer.quote(broker_config)(pricer_id, input) ?| ()
+      pricer <- pricer_factory.build(pricer_id)                    ?| ()
+      result <- pricer.quote(wakam_quote_config)(pricer_id, input) ?| ()
     } yield {
       val translated_result = result.translate()(Lang(lang))
       Ok(Json.toJson(translated_result))
@@ -54,6 +54,6 @@ class QuoteController @Inject() (
    * This is custom json used to store broker configuration
    * Like API key / secret
    */
-  private[this] val broker_config       = Some(Json.parse("""{}"""))
+  private[this] val wakam_quote_config  = Some(Json.parse("""{}"""))
   private[this] val wakam_select_config = Some(Json.parse("""{}"""))
 }
