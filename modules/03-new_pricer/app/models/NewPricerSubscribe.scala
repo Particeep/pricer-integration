@@ -1,8 +1,8 @@
-package wakam.home.models
+package newpricer.models
 
 import java.time.OffsetDateTime
 
-private[wakam] final case class WakamSubscribe(
+private[newpricer] final case class NewPricerSubscribe(
   quote_reference:                   String,
   reference_client:                  String,
   start_date_effect:                 OffsetDateTime,
@@ -34,7 +34,7 @@ private[wakam] final case class WakamSubscribe(
   previous_policy_number:            String,
   previous_policy_subscription_date: OffsetDateTime
 )
-private[wakam] case class Beneficiaries(
+private[newpricer] case class Beneficiaries(
   kind:          String,
   title:         String,
   last_name:     String,

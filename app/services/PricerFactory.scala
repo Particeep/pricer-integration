@@ -3,13 +3,13 @@ package services
 import domain.PricerService
 import helpers.sorus.Fail
 import scalaz.{ -\/, \/, \/- }
-import wakam.home.WakamHome
+import newpricer.NewPricer
 
 import javax.inject.{ Inject, Singleton }
 
 @Singleton
 class PricerFactory @Inject() (
-  wakam_home: WakamHome
+  new_pricer: NewPricer
 ) {
 
   def build(pricer_id: String): Fail \/ PricerService = {
@@ -21,6 +21,6 @@ class PricerFactory @Inject() (
   }
 
   private[this] val all_pricers = Map(
-    "wakam_home_3c25657e-2952-11ed-a261-0242ac120002" -> wakam_home
+    "new_pricer_3c25657e-2952-11ed-a261-0242ac120002" -> new_pricer
   )
 }

@@ -25,7 +25,7 @@ lazy val domain: Project = (project in file("modules/02-domain"))
   .settings(commonSettings: _*)
   .dependsOn(core % "test->test;compile->compile")
 
-lazy val wakam: Project  = (project in file("modules/03-wakam"))
+lazy val new_pricer: Project  = (project in file("modules/03-new_pricer"))
   .enablePlugins(PlayScala)
   .settings(commonPlaySettings: _*)
   .dependsOn(core % "test->test;compile->compile", domain)
@@ -36,12 +36,12 @@ lazy val root: Project   = (project in file("."))
   .aggregate(
     core,
     domain,
-    wakam
+    new_pricer
   )
   .dependsOn(
     core % "test->test;compile->compile",
     domain,
-    wakam
+    new_pricer
   )
 
 lazy val deps_common = Seq(

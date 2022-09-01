@@ -1,11 +1,11 @@
-package wakam.home.models.enumerations
+package newpricer.models.enumerations
 
 import helpers.{ Enum, EnumHelper }
 import play.api.libs.json.{ JsString, JsValue, Writes }
 
-private[wakam] sealed trait OccupationStatus extends Product with Serializable with Enum
+private[newpricer] sealed trait OccupationStatus extends Product with Serializable with Enum
 
-private[wakam] object OccupationStatus extends EnumHelper[OccupationStatus] {
+private[newpricer] object OccupationStatus extends EnumHelper[OccupationStatus] {
 
   final case object TENANT         extends OccupationStatus { override def label(): String = "Locataire"             }
   final case object OCCUPANT_OWNER extends OccupationStatus { override def label(): String = "Propriétaire occupant" }

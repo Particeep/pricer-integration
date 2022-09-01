@@ -1,11 +1,11 @@
-package wakam.home.models.enumerations
+package newpricer.models.enumerations
 
 import helpers.{ Enum, EnumHelper }
 import play.api.libs.json.{ JsString, JsValue, Writes }
 
-private[wakam] sealed trait ComputerOption extends Product with Serializable with Enum
+private[newpricer] sealed trait ComputerOption extends Product with Serializable with Enum
 
-private[wakam] object ComputerOption extends EnumHelper[ComputerOption] {
+private[newpricer] object ComputerOption extends EnumHelper[ComputerOption] {
 
   final case object YES       extends ComputerOption { override def label(): String = "Oui"       }
   final case object NO        extends ComputerOption { override def label(): String = "Non"       }

@@ -1,11 +1,11 @@
-package wakam.home.models.enumerations
+package newpricer.models.enumerations
 
 import helpers.{ Enum, EnumHelper }
 import play.api.libs.json.{ JsString, JsValue, Writes }
 
-private[wakam] sealed trait NomadicBusinessOption extends Product with Serializable with Enum
+private[newpricer] sealed trait NomadicBusinessOption extends Product with Serializable with Enum
 
-private[wakam] object NomadicBusinessOption extends EnumHelper[NomadicBusinessOption] {
+private[newpricer] object NomadicBusinessOption extends EnumHelper[NomadicBusinessOption] {
 
   final case object NO         extends NomadicBusinessOption { override def label(): String = "Non"        }
   final case object INDIVIDUAL extends NomadicBusinessOption { override def label(): String = "Individuel" }

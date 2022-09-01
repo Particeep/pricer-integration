@@ -1,6 +1,6 @@
-package wakam.home.models
+package newpricer.models
 
-private[wakam] final case class WakamQuote(
+private[newpricer] final case class NewPricerQuote(
   postal_code:                         String,
   municipality:                        String,
   nature:                              String,
@@ -35,8 +35,8 @@ private[wakam] final case class WakamQuote(
   commercial_latitude_requested:       String
 )
 
-private[wakam] object WakamQuote {
-  private[wakam] def convert_boolean_to_yes_no(option: Boolean): String = {
+private[newpricer] object NewPricerQuote {
+  private[newpricer] def convert_boolean_to_yes_no(option: Boolean): String = {
     if(option) "Oui" else "Non"
   }
 }

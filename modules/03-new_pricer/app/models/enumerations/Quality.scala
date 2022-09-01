@@ -1,11 +1,11 @@
-package wakam.home.models.enumerations
+package newpricer.models.enumerations
 
 import helpers.{ Enum, EnumHelper }
 import play.api.libs.json.{ JsString, JsValue, Writes }
 
-private[wakam] sealed trait Quality extends Product with Serializable with Enum
+private[newpricer] sealed trait Quality extends Product with Serializable with Enum
 
-private[wakam] object Quality extends EnumHelper[Quality] {
+private[newpricer] object Quality extends EnumHelper[Quality] {
 
   final case object `1` extends Quality { override def label(): String = "1" }
   final case object `2` extends Quality { override def label(): String = "2" }

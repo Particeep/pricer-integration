@@ -1,11 +1,11 @@
-package wakam.home.models.enumerations
+package newpricer.models.enumerations
 
 import helpers.{ Enum, EnumHelper }
 import play.api.libs.json.{ JsString, JsValue, Writes }
 
-private[wakam] sealed trait CommercialLatitudeRequested extends Product with Serializable with Enum
+private[newpricer] sealed trait CommercialLatitudeRequested extends Product with Serializable with Enum
 
-private[wakam] object CommercialLatitudeRequested extends EnumHelper[CommercialLatitudeRequested] {
+private[newpricer] object CommercialLatitudeRequested extends EnumHelper[CommercialLatitudeRequested] {
   final case object `-15%` extends CommercialLatitudeRequested { override def label(): String = "-15%" }
   final case object `-10%` extends CommercialLatitudeRequested { override def label(): String = "-10%" }
   final case object `-5%`  extends CommercialLatitudeRequested { override def label(): String = "-5%"  }

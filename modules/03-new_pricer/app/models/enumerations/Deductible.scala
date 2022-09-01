@@ -1,11 +1,11 @@
-package wakam.home.models.enumerations
+package newpricer.models.enumerations
 
 import helpers.{ Enum, EnumHelper }
 import play.api.libs.json.{ JsString, JsValue, Writes }
 
-private[wakam] sealed trait Deductible extends Product with Serializable with Enum
+private[newpricer] sealed trait Deductible extends Product with Serializable with Enum
 
-private[wakam] object Deductible extends EnumHelper[Deductible] {
+private[newpricer] object Deductible extends EnumHelper[Deductible] {
 
   final case object BASE_DEDUCTIBLE               extends Deductible { override def label(): String = "Franchise de Base" }
   final case object INCREASE_IN_DEDUCTIBLE        extends Deductible {

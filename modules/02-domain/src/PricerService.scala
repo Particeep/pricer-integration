@@ -10,15 +10,15 @@ trait PricerService {
 
   def input_format(pricer_id: String): List[InputFormat]
 
-  def quote(wakam_quote_config: Option[JsValue])(
-    pricer_id:                  String,
-    quote_input:                QuoteInput
+  def quote(new_pricer_quote_config: Option[JsValue])(
+    pricer_id:                       String,
+    quote_input:                     QuoteInput
   ): Future[Fail \/ PricerResponse]
 
   def input_select_format(pricer_id: String): List[InputFormat]
 
-  def select(wakam_select_config: Option[JsValue])(
-    pricer_id:                    String,
-    subscription_input:           SelectSubscriptionInput
+  def select(new_pricer_select_config: Option[JsValue])(
+    pricer_id:                         String,
+    subscription_input:                SelectSubscriptionInput
   ): Future[Fail \/ SelectSubscriptionOutput]
 }

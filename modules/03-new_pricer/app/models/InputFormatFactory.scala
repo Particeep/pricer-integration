@@ -1,11 +1,11 @@
-package wakam.home.models
+package newpricer.models
 
 import domain.FieldType.{ BOOLEAN, DATE, ENUM, NUMBER, OBJECT, TEXT }
 import domain.InputFormat
 
-import wakam.home.models.enumerations._
+import newpricer.models.enumerations._
 
-private[wakam] object InputFormatFactory {
+private[newpricer] object InputFormatFactory {
 
   /**
    * This should be the format of the input required by the quote endpoint
