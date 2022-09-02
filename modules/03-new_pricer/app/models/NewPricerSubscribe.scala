@@ -22,7 +22,7 @@ private[newpricer] final case class NewPricerSubscribe(
   address:                           String,
   municipality:                      String,
   postal_code:                       String,
-  beneficiaries:                     List[Beneficiaries],
+  beneficiaries:                     List[Beneficiary],
   date_of_birth:                     OffsetDateTime,
   said_place:                        String,
   channel_name:                      String,
@@ -34,7 +34,7 @@ private[newpricer] final case class NewPricerSubscribe(
   previous_policy_number:            String,
   previous_policy_subscription_date: OffsetDateTime
 )
-private[newpricer] case class Beneficiaries(
+private[newpricer] case class Beneficiary(
   kind:          String,
   title:         String,
   last_name:     String,

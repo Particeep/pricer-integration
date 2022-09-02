@@ -8,13 +8,7 @@ import play.api.libs.ws.WSClient
 import scalaz.{ -\/, \/, \/- }
 import test.TestHelper
 import utils.TimeUtils
-import newpricer.models.{
-  NewPricerJsonParser,
-  NewPricerQuote,
-  NewPricerQuoteConfig,
-  NewPricerSelectConfig,
-  NewPricerSubscribe
-}
+import newpricer.models._
 import newpricer.services.NewPricerService
 
 import java.time.OffsetDateTime
@@ -24,9 +18,16 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
 import com.typesafe.config.{ Config, ConfigFactory }
 import newpricer.models.NewPricerResponse.SuccessCase
-import play.api.libs.json.Json
+import org.scalatest.PrivateMethodTester
+import org.scalatest.PrivateMethodTester.PrivateMethod
+import org.scalatestplus.mockito.MockitoSugar.mock
 
-class NewPricerServiceTest extends PlaySpec with GuiceOneServerPerTest with TestHelper with NewPricerJsonParser {
+class NewPricerServiceTest
+  extends PlaySpec
+    with GuiceOneServerPerTest
+    with TestHelper
+    with NewPricerJsonParser
+    with PrivateMethodTester {
   private[this] val new_pricer_quote: NewPricerQuote                = NewPricerQuote(
     "75002",
     "PARIS-2E-ARRONDISSEMENT",
@@ -110,13 +111,10 @@ class NewPricerServiceTest extends PlaySpec with GuiceOneServerPerTest with Test
       val new_pricer_service: NewPricerService =
         new NewPricerService(ws = ws, config = configuration)
       val response: Fail \/ PricerResponse     = await(new_pricer_service.quote(new_pricer_quote, new_pricer_quote_config))
-      response.fold(
-        error => fail(s"error in new pricer response: ${error.message}"),
-        {
-          case offer: Offer   => offer.price mustBe offer_data.price
-          case other_response => fail(s"unexpected response: $other_response ")
-        }
-      )
+      response match {
+        case \/-(Offer(price, _, _, _, _)) => price mustBe offer_data.price
+        case error                         => fail(s"unexpected error: $error")
+      }
     }
 
     "return failure with invalid quote data" in {
@@ -129,7 +127,7 @@ class NewPricerServiceTest extends PlaySpec with GuiceOneServerPerTest with Test
         fail => {
           fail.message contains "Les paramétres transmis ne permettent pas d'établir un tarif. Vérifier les modalités transmises."
         },
-        _ => succeed
+        result => fail(s"unexpected response: $result")
       )
     }
 
@@ -143,15 +141,17 @@ class NewPricerServiceTest extends PlaySpec with GuiceOneServerPerTest with Test
         fail => {
           fail.message contains "Unprocessable entity"
         },
-        _ => succeed
+        result => fail(s"unexpected response: $result")
       )
     }
 
-    "parse new pricer quote api response and return an offer" in {
-      val ws: WSClient                         = app.injector.instanceOf[WSClient]
-      val new_pricer_service: NewPricerService = new NewPricerService(ws = ws, config = configuration)
+    "return offer from parse new pricer quote with valid data" in {
+      val ws: WSClient                         = mock[WSClient]
+      val config                               = mock[Configuration]
+      val new_pricer_service: NewPricerService = new NewPricerService(ws = ws, config = config)
+      val parse_response                       = PrivateMethod[Offer](Symbol("parse_new_pricer_quote_response"))
       val api_response                         = SuccessCase("8722b2eb-9069-4e5d-a174-889ee5c7c06c", "OK", "241.59")
-      val offer: Offer                         = new_pricer_service.parse_new_pricer_quote_response(api_response)
+      val offer: Offer                         = new_pricer_service invokePrivate parse_response(api_response)
       offer.price mustBe offer_data.price
     }
 
@@ -175,7 +175,7 @@ class NewPricerServiceTest extends PlaySpec with GuiceOneServerPerTest with Test
       val response                             = await(new_pricer_service.select(new_selection, new_pricer_select_config, selected_quote))
       response.fold(
         fail => fail.message contains "Unprocessable entity",
-        _ => succeed
+        result => fail(s"unexpected response: $result")
       )
 
     }

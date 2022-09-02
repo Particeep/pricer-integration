@@ -3,7 +3,7 @@ package newpricer.models
 import ai.x.play.json.Encoders.encoder
 import ai.x.play.json.Jsonx
 import play.api.libs.json.{ JsValue, Json, OFormat, Reads, Writes }
-import newpricer.models.NewPricerResponse.{ FailureCase, SuccessCase }
+import newpricer.models.NewPricerResponse.SuccessCase
 
 private[newpricer] trait NewPricerJsonParser {
   implicit val new_pricer_quote_config_format: OFormat[NewPricerQuoteConfig]   =
@@ -58,7 +58,6 @@ private[newpricer] trait NewPricerJsonParser {
   }
   implicit val new_pricer_quote_format: OFormat[NewPricerQuote]                = Jsonx.formatCaseClass[NewPricerQuote]
   implicit val success_case_format: OFormat[SuccessCase]                       = Json.format[SuccessCase]
-  implicit val failure_case_format: OFormat[FailureCase]                       = Json.format[FailureCase]
   implicit val new_pricer_select_config_format: OFormat[NewPricerSelectConfig] = Json.format[NewPricerSelectConfig]
   implicit val new_pricer_subscribe_write: Writes[NewPricerSubscribe]          = new Writes[NewPricerSubscribe] {
     override def writes(new_pricer_subscribe: NewPricerSubscribe): JsValue = Json.obj(
@@ -95,14 +94,14 @@ private[newpricer] trait NewPricerJsonParser {
     )
   }
   implicit val new_pricer_subscribe_read: OFormat[NewPricerSubscribe]          = Jsonx.formatCaseClass[NewPricerSubscribe]
-  implicit val beneficiaries_read: Reads[Beneficiaries]                        = Json.reads[Beneficiaries]
-  implicit val beneficiaries_write: Writes[Beneficiaries]                      = new Writes[Beneficiaries] {
-    override def writes(o: Beneficiaries): JsValue = Json.obj(
-      "Type"            -> o.kind,
-      "Titre"           -> o.title,
-      "Nom"             -> o.last_name,
-      "Prenom"          -> o.first_name,
-      "DateDeNaissance" -> o.date_of_birth.toString
+  implicit val beneficiaries_read: Reads[Beneficiary]                          = Json.reads[Beneficiary]
+  implicit val beneficiaries_write: Writes[Beneficiary]                        = new Writes[Beneficiary] {
+    override def writes(beneficiary: Beneficiary): JsValue = Json.obj(
+      "Type"            -> beneficiary.kind,
+      "Titre"           -> beneficiary.title,
+      "Nom"             -> beneficiary.last_name,
+      "Prenom"          -> beneficiary.first_name,
+      "DateDeNaissance" -> beneficiary.date_of_birth.toString
     )
   }
 

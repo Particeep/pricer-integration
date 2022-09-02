@@ -32,8 +32,8 @@ class QuoteController @Inject() (
     val input = QuoteInput(request.body)
     val lang  = request.headers.get("lang").getOrElse("fr")
     for {
-      pricer <- pricer_factory.build(pricer_id)                         ?| ()
-      result <- pricer.quote(new_pricer_quote_config)(pricer_id, input) ?| ()
+      pricer <- pricer_factory.build(pricer_id)               ?| ()
+      result <- pricer.quote(broker_config)(pricer_id, input) ?| ()
     } yield {
       val translated_result = result.translate()(Lang(lang))
       Ok(Json.toJson(translated_result))
@@ -42,9 +42,9 @@ class QuoteController @Inject() (
 
   def select(pricer_id: String): Action[JsValue] = Action.sorus(parse.json) { implicit request =>
     for {
-      input  <- request.body.validate[SelectSubscriptionInput]            ?| ()
-      pricer <- pricer_factory.build(pricer_id)                           ?| ()
-      result <- pricer.select(new_pricer_select_config)(pricer_id, input) ?| ()
+      input  <- request.body.validate[SelectSubscriptionInput] ?| ()
+      pricer <- pricer_factory.build(pricer_id)                ?| ()
+      result <- pricer.select(broker_config)(pricer_id, input) ?| ()
     } yield {
       Ok(Json.toJson(result))
     }
@@ -54,6 +54,5 @@ class QuoteController @Inject() (
    * This is custom json used to store broker configuration
    * Like API key / secret
    */
-  private[this] val new_pricer_quote_config  = Some(Json.parse("""{}"""))
-  private[this] val new_pricer_select_config = Some(Json.parse("""{}"""))
+  private[this] val broker_config = Some(Json.parse("""{}"""))
 }

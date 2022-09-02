@@ -6,12 +6,12 @@ import helpers.sorus.Fail
 import helpers.sorus.SorusDSL.Sorus
 
 import javax.inject.{ Inject, Singleton }
-import play.api.libs.json.{ JsError, JsSuccess, Json }
-import play.api.libs.ws.{ WSClient, WSResponse }
+import play.api.libs.json.Json
+import play.api.libs.ws.WSClient
 import play.api.{ Configuration, Logging }
-import scalaz.{ -\/, \/, \/- }
+import scalaz.\/
 import utils.NumberUtils.amountFromDoubleToCentime
-import newpricer.models.NewPricerResponse.{ FailureCase, SuccessCase }
+import newpricer.models.NewPricerResponse.SuccessCase
 import newpricer.models.{
   NewPricerJsonParser,
   NewPricerQuote,
@@ -34,7 +34,7 @@ private[newpricer] class NewPricerService @Inject() (
 
   private[this] val new_pricer_url = config.get[String]("new_pricer.url")
 
-  private[newpricer] def parse_new_pricer_quote_response(response: SuccessCase): Offer = {
+  private[this] def parse_new_pricer_quote_response(response: SuccessCase): Offer = {
     Offer(
       Price(Amount(amountFromDoubleToCentime(PricerBaseCalculator.average_price(
         response.MontantTotalPrimeTTC.toDouble,
