@@ -75,9 +75,9 @@ You can see input format like a schema and not a function. What you put in defin
 For your perimeter you just have to translate into input format your case class. Case class you have to transform into input format are case class for quote and case class for select.
 
 All the data you are going to receive comes from an external server, let's call it X.
-the purpose of the server x  is to send you the JSON-formatted representation of your classes. 
+the purpose of the server X  is to send you the JSON-formatted representation of your classes. 
 Therefore, it will suffice to use play json to transform the JSON into the format of the expected class  
-For this it will send you the JSON depending on how you defined the input format.
+For this, it will send you the JSON depending on how you defined the input format.
 
 Server X does not just send this, it sends you the data from the pricing (quote) in order to reuse it if necessary for the context transfer (select)
 
