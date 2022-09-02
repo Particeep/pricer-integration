@@ -2,8 +2,8 @@ package services
 
 import domain.PricerService
 import helpers.sorus.Fail
-import scalaz.{ -\/, \/, \/- }
 import newpricer.NewPricer
+import scalaz.{ -\/, \/, \/- }
 
 import javax.inject.{ Inject, Singleton }
 

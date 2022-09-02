@@ -6,9 +6,10 @@ import play.twirl.api.Html
 @Singleton
 class ApplicationController extends BaseController {
 
-  def ping  = Action {
+  def ping = Action {
     Ok("ok")
   }
+
   def index = Action {
     Ok(Html(s"""
     <h1>New Pricer Implementation</h1>

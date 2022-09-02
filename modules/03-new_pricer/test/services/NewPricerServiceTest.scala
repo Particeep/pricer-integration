@@ -19,7 +19,6 @@ import org.scalatestplus.play.guice.GuiceOneServerPerTest
 import com.typesafe.config.{ Config, ConfigFactory }
 import newpricer.models.NewPricerResponse.SuccessCase
 import org.scalatest.PrivateMethodTester
-import org.scalatest.PrivateMethodTester.PrivateMethod
 import org.scalatestplus.mockito.MockitoSugar.mock
 
 class NewPricerServiceTest
