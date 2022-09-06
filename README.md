@@ -48,6 +48,10 @@ There are 3 sbt modules
 
 The main goal is to complete the module `/modules/03-newpricer` with code that implements the pricer assigned to you.
 
+Important :
+* You should not change any code outside the 03-newpricer module
+* You should not rename the module `newpricer`, the rule apply to class like NewPricerConfig
+
 Especially this part which contains an unimplemented method, i.e. with `???` as a body
 
 * `InputFormatFactory.input_format_quote`
@@ -64,17 +68,29 @@ And empty case class
 # InputFormat
 
 InputFormat is a schema that describes json in a way that suits our needs.
-InputFormat is a schema that describes the json input needed by the webservice. It's a static constant.
-
+InputFormat describes the json input needed by the webservice. It's a static constant.
 The building blocks are defined in the domain module
 
 * `input_format_quote` describes the json input of the `quote` endpoint
 * `input_format_select` describes the json input of the `select` endpoint, minus any fields already defined in `input_format_quote`
 
+### how does it work ?
+You can see input format like a schema and not a function. What you put in define a case class. This schema is parsed by another application, and you do not have to think about it.
+For your perimeter you just have to translate into input format your case class. Case class you have to transform into input format are case class for quote and case class for select.
+
+All the data you are going to receive comes from an external server, let's call it X.
+the purpose of the server X is to send you the JSON-formatted representation of your classes. 
+Therefore, it will suffice to use play json to transform the JSON into the format of the expected class  
+For this, it will send you the JSON depending on how you defined the input format.
+
+Note : Server X will always send you all input you need to implement quote and select. It includes your input format for quote, select and external data if you defined one.
+
+As mentioned above, you are not going to dialogue with the server X, to check the input_format you have to do a unit test that takes a json as input 
+and sees if by transforming the json into the expected class there is no problem
+
 ## Basic structure
-
+Input format is defined in module "domain" :
 ```scala
-
 case class InputFormat(
   // The name of the field, like the name of a field in an HTML form. It's the unique identifier of the field
   name:             String,
@@ -111,7 +127,27 @@ NB 1: if `is_array` is true, then the json type is an array and the elements of 
 NB 2: if `is_array` is false and `multiple` is true then this is the case where it creates a checkbox, and fields defined by data in the "option" attribute.
 
 ## Sample Code
+Let's see an example. 
+In input, we received a JSON.
 
+```JSON
+{
+  "assures" : [ {
+    "civility" : "MR",
+    "first_name" : "Patrick",
+    "last_name" : "smile",
+    "birthdate" : "2002-08-24T07:52:54Z",
+    "is_smoking" : true
+  }, {
+    "civility" : "MME",
+    "first_name" : "Sofia",
+    "last_name" : "smile",
+    "birthdate" : "1992-08-24T07:52:54Z",
+    "is_smoking" : false
+  } ]
+}
+```
+This input correspond to this input format :
 ```scala
 
 val insureds_format = {
@@ -153,6 +189,43 @@ private[this] def smoker_format: InputFormat = {
 }
 
 ```
+If needed, you can create a case class corresponding to your input format
+```scala
+
+final case class InsuredInformation( 
+  civility : String,
+  first_name : String,
+  last_name : String,
+  birthdate : OffsetDateTime,
+  s_smoking : Option[Boolean]
+)
+final case class Data(assures : List[InsuredInformation])
+```
+And then, you can use .validate to parse your JSON.
+````scala
+val data_from_server_x : JsValue = {
+  "assures" : [ {
+    "civility" : "MR",
+    "first_name" : "Patrick",
+    "last_name" : "smile",
+    "birthdate" : "2002-08-24T07:52:54Z",
+    "is_smoking" : true
+  }, {
+    "civility" : "MME",
+    "first_name" : "Sofia",
+    "last_name" : "smile",
+    "birthdate" : "1992-08-24T07:52:54Z",
+    "is_smoking" : false
+  } ]
+}
+
+for {
+  value : Data <- data_from_server_x.validate[Data] ?| "error during parsing"
+    ???
+}yield {
+  ???
+}
+````
 
 # Quote endpoint
 
@@ -414,6 +487,8 @@ For more detail, see this article : https://medium.com/@adriencrovetto/error-han
 * enforce encapsulation as much as possible, e.g. use private[newpricer] except for the three methods implemented by `PricerService`. Use private[this] if needed.
 * run `sbt scalastyle` and clean up the warning
 * run `sbt fmt` and format the code
+* no `.as` use `.validate`
+* no `asInstanceOf`or all types of method which break immutable principe
 
 # error management and log
 
