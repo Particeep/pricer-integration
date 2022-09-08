@@ -3,7 +3,7 @@ package newpricer.models
 import ai.x.play.json.Encoders.encoder
 import ai.x.play.json.Jsonx
 import play.api.libs.json.{ JsValue, Json, OFormat, Reads, Writes }
-import newpricer.models.NewPricerResponse.SuccessCase
+import newpricer.models.NewPricerQuoteResponse
 
 private[newpricer] trait NewPricerJsonParser {
   implicit val new_pricer_quote_config_format: OFormat[NewPricerQuoteConfig]   =
@@ -57,8 +57,8 @@ private[newpricer] trait NewPricerJsonParser {
     )
   }
   implicit val new_pricer_quote_format: OFormat[NewPricerQuote]                = Jsonx.formatCaseClass[NewPricerQuote]
-  implicit val warranty_format                                                 = Json.format[Warranty]
-  implicit val success_case_format: OFormat[SuccessCase]                       = Json.format[SuccessCase]
+  implicit val warranty_format: OFormat[Warranty] = Json.format[Warranty]
+  implicit val success_case_format: OFormat[NewPricerQuoteResponse]            = Json.format[NewPricerQuoteResponse]
   implicit val new_pricer_select_config_format: OFormat[NewPricerSelectConfig] = Json.format[NewPricerSelectConfig]
   implicit val new_pricer_subscribe_write: Writes[NewPricerSubscribe]          = new Writes[NewPricerSubscribe] {
     override def writes(new_pricer_subscribe: NewPricerSubscribe): JsValue = Json.obj(

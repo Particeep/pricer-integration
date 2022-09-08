@@ -1,5 +1,6 @@
 package newpricer.models
 
+import newpricer.models.enumerations.{ Quality, Title }
 import java.time.OffsetDateTime
 
 private[newpricer] final case class NewPricerSubscribe(
@@ -11,7 +12,7 @@ private[newpricer] final case class NewPricerSubscribe(
   first_due_date:                    OffsetDateTime,
   last_name:                         String,
   first_name:                        String,
-  title:                             String,
+  title:                             Title,
   email:                             String,
   iban:                              String,
   bic:                               String,
@@ -27,7 +28,7 @@ private[newpricer] final case class NewPricerSubscribe(
   said_place:                        String,
   channel_name:                      String,
   channel_number:                    Int,
-  quality:                           String,
+  quality:                           Quality,
   payment_number:                    String,
   payment_amount:                    Int,
   previous_insurer:                  String,

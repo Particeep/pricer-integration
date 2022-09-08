@@ -52,7 +52,7 @@ private[newpricer] object InputFormatFactory {
       ),
       InputFormat(
         name           = "electrical_damage_option",
-        kind           = ENUM,
+        kind           = BOOLEAN,
         mandatory      = true
       ),
       InputFormat(

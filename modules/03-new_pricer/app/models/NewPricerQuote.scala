@@ -1,20 +1,29 @@
 package newpricer.models
 
+import newpricer.models.enumerations.{
+  CommercialLatitudeRequested,
+  ComputerOption,
+  Deductible,
+  NomadicBusinessOption,
+  OccupationStatus,
+  Stage
+}
+
 private[newpricer] final case class NewPricerQuote(
   postal_code:                         String,
   municipality:                        String,
   nature:                              String,
-  occupation_status:                   String,
+  occupation_status:                   OccupationStatus,
   type_of_residence:                   String,
   number_of_rooms:                     Int,
-  stage:                               String,
+  stage:                               Stage,
   surface:                             String,
   movable_capital:                     String,
   capital_valuables:                   String,
-  deductible:                          String,
-  nomadic_business_option:             String,
+  deductible:                          Deductible,
+  nomadic_business_option:             NomadicBusinessOption,
   smartphone_option:                   Boolean,
-  computer_option:                     String,
+  computer_option:                     ComputerOption,
   electrical_damage_option:            String,
   ice_breaker_option:                  Boolean,
   nursery_assistant_rc_option:         Boolean,
@@ -32,7 +41,7 @@ private[newpricer] final case class NewPricerQuote(
   school_insurance_option:             Boolean,
   wine_cellar_option:                  Boolean,
   dependence:                          Boolean,
-  commercial_latitude_requested:       String
+  commercial_latitude_requested:       CommercialLatitudeRequested
 )
 
 private[newpricer] object NewPricerQuote {

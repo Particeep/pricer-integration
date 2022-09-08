@@ -11,7 +11,7 @@ import play.api.libs.ws.WSClient
 import play.api.{ Configuration, Logging }
 import scalaz.{ -\/, \/, \/- }
 import utils.NumberUtils.amountFromDoubleToCentime
-import newpricer.models.NewPricerResponse.SuccessCase
+import newpricer.models.NewPricerQuoteResponse
 import newpricer.models.{
   NewPricerJsonParser,
   NewPricerQuote,
@@ -40,7 +40,7 @@ private[newpricer] class NewPricerService @Inject() (
   }
 
   private[this] def parse_new_pricer_quote_response(response: JsValue): Fail \/ Offer = {
-    response.validate[SuccessCase].fold(
+    response.validate[NewPricerQuoteResponse].fold(
       error => -\/(Fail(s"Error in parsing response: ${error.map(_._2.mkString(" "))}")),
       data =>
         \/-(Offer(
