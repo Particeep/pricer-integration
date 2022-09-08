@@ -3,7 +3,6 @@ package newpricer.models
 import ai.x.play.json.Encoders.encoder
 import ai.x.play.json.Jsonx
 import play.api.libs.json.{ JsValue, Json, OFormat, Reads, Writes }
-import newpricer.models.NewPricerQuoteResponse
 
 private[newpricer] trait NewPricerJsonParser {
   implicit val new_pricer_quote_config_format: OFormat[NewPricerQuoteConfig]   =
@@ -13,18 +12,20 @@ private[newpricer] trait NewPricerJsonParser {
       "CodePostal"                          -> new_pricer_quote.postal_code,
       "Commune"                             -> new_pricer_quote.municipality,
       "Nature"                              -> new_pricer_quote.nature,
-      "StatutOccupation"                    -> new_pricer_quote.occupation_status,
+      "StatutOccupation"                    -> new_pricer_quote.occupation_status.label(),
       "TypeDeResidence"                     -> new_pricer_quote.type_of_residence,
       "NombreDePieces"                      -> new_pricer_quote.number_of_rooms,
-      "Etage"                               -> new_pricer_quote.stage,
-      "Surface"                             -> new_pricer_quote.surface,
-      "CapitalMobilier"                     -> new_pricer_quote.movable_capital,
-      "CapitalObjetsdeValeur"               -> new_pricer_quote.capital_valuables,
-      "Franchise"                           -> new_pricer_quote.deductible,
-      "OptionAffairesNomades"               -> new_pricer_quote.nomadic_business_option,
+      "Etage"                               -> new_pricer_quote.stage.label(),
+      "Surface"                             -> new_pricer_quote.surface.toString,
+      "CapitalMobilier"                     -> new_pricer_quote.movable_capital.toString,
+      "CapitalObjetsdeValeur"               -> new_pricer_quote.capital_valuables.toString,
+      "Franchise"                           -> new_pricer_quote.deductible.label(),
+      "OptionAffairesNomades"               -> new_pricer_quote.nomadic_business_option.label(),
       "OptionSmartphone"                    -> NewPricerQuote.convert_boolean_to_yes_no(new_pricer_quote.smartphone_option),
-      "OptionOrdinateur"                    -> new_pricer_quote.computer_option,
-      "OptionDommagesElectriques"           -> new_pricer_quote.electrical_damage_option,
+      "OptionOrdinateur"                    -> new_pricer_quote.computer_option.label(),
+      "OptionDommagesElectriques"           -> NewPricerQuote.convert_boolean_to_yes_no(
+        new_pricer_quote.electrical_damage_option
+      ),
       "OptionBrisDeGlace"                   -> NewPricerQuote.convert_boolean_to_yes_no(new_pricer_quote.ice_breaker_option),
       "OptionRCAssistanceMaternelle"        -> NewPricerQuote.convert_boolean_to_yes_no(
         new_pricer_quote.nursery_assistant_rc_option
@@ -53,11 +54,11 @@ private[newpricer] trait NewPricerJsonParser {
       "OptionAssuranceScolaire"             -> NewPricerQuote.convert_boolean_to_yes_no(new_pricer_quote.school_insurance_option),
       "OptionCaveAVin"                      -> NewPricerQuote.convert_boolean_to_yes_no(new_pricer_quote.wine_cellar_option),
       "Dependance"                          -> NewPricerQuote.convert_boolean_to_yes_no(new_pricer_quote.dependence),
-      "LatitudeCommercialeDemandee"         -> new_pricer_quote.commercial_latitude_requested
+      "LatitudeCommercialeDemandee"         -> new_pricer_quote.commercial_latitude_requested.label()
     )
   }
   implicit val new_pricer_quote_format: OFormat[NewPricerQuote]                = Jsonx.formatCaseClass[NewPricerQuote]
-  implicit val warranty_format: OFormat[Warranty] = Json.format[Warranty]
+  implicit val warranty_format: OFormat[Warranty]                              = Json.format[Warranty]
   implicit val success_case_format: OFormat[NewPricerQuoteResponse]            = Json.format[NewPricerQuoteResponse]
   implicit val new_pricer_select_config_format: OFormat[NewPricerSelectConfig] = Json.format[NewPricerSelectConfig]
   implicit val new_pricer_subscribe_write: Writes[NewPricerSubscribe]          = new Writes[NewPricerSubscribe] {
