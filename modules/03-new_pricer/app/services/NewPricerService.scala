@@ -6,10 +6,10 @@ import helpers.sorus.Fail
 import helpers.sorus.SorusDSL.Sorus
 
 import javax.inject.{ Inject, Singleton }
-import play.api.libs.json.Json
+import play.api.libs.json.{ JsValue, Json }
 import play.api.libs.ws.WSClient
 import play.api.{ Configuration, Logging }
-import scalaz.\/
+import scalaz.{ -\/, \/, \/- }
 import utils.NumberUtils.amountFromDoubleToCentime
 import newpricer.models.NewPricerResponse.SuccessCase
 import newpricer.models.{
@@ -17,7 +17,8 @@ import newpricer.models.{
   NewPricerQuote,
   NewPricerQuoteConfig,
   NewPricerSelectConfig,
-  NewPricerSubscribe
+  NewPricerSubscribe,
+  Warranty
 }
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -34,14 +35,31 @@ private[newpricer] class NewPricerService @Inject() (
 
   private[this] val new_pricer_url = config.get[String]("new_pricer.url")
 
-  private[this] def parse_new_pricer_quote_response(response: SuccessCase): Offer = {
-    Offer(
-      Price(Amount(amountFromDoubleToCentime(PricerBaseCalculator.average_price(
-        response.MontantTotalPrimeTTC.toDouble,
-        12
-      )))),
-      external_data = Some(Json.obj("quote_reference" -> response.QuoteReference))
+  private[this] def transform_to_offer_items(warranties: List[Warranty]): List[PricerResponse.OfferItem] = {
+    warranties.flatMap(_.transform_to_offer_item)
+  }
+
+  private[this] def parse_new_pricer_quote_response(response: JsValue): Fail \/ Offer = {
+    response.validate[SuccessCase].fold(
+      error => -\/(Fail(s"Error in parsing response: ${error.map(_._2.mkString(" "))}")),
+      data =>
+        \/-(Offer(
+          Price(Amount(amountFromDoubleToCentime(PricerBaseCalculator.average_price(
+            data.MontantTotalPrimeHT.toDouble,
+            12
+          )))),
+          detail        = transform_to_offer_items(data.Garanties),
+          external_data = Some(Json.obj("quote_reference" -> data.QuoteReference))
+        ))
     )
+  }
+
+  private[this] def check_response_status(status: Int, body: JsValue): Fail \/ Offer = {
+    status match {
+      case 200             => parse_new_pricer_quote_response(body)
+      case 400 | 401 | 524 => -\/(Fail(s"Error from wakam api with status: $status and body: $body"))
+      case _               => -\/(Fail(s"Unexpected Error with status: $status and body: $body"))
+    }
   }
 
   /**
@@ -57,9 +75,9 @@ private[newpricer] class NewPricerService @Inject() (
       response <- ws.url(s"$new_pricer_url/getPrice").addHttpHeaders("Ocp-Apim-Subscription-Key" -> config.key).post(
                     Json.toJson(request)(new_pricer_quote_write)
                   ) ?| ()
-      result   <- response.json.validate[SuccessCase] ?| s"error in parsing response from api: ${response.body}"
+      offer    <- check_response_status(response.status, response.json) ?| ()
     } yield {
-      parse_new_pricer_quote_response(result)
+      offer
     }
   }
 

@@ -57,6 +57,7 @@ private[newpricer] trait NewPricerJsonParser {
     )
   }
   implicit val new_pricer_quote_format: OFormat[NewPricerQuote]                = Jsonx.formatCaseClass[NewPricerQuote]
+  implicit val warranty_format                                                 = Json.format[Warranty]
   implicit val success_case_format: OFormat[SuccessCase]                       = Json.format[SuccessCase]
   implicit val new_pricer_select_config_format: OFormat[NewPricerSelectConfig] = Json.format[NewPricerSelectConfig]
   implicit val new_pricer_subscribe_write: Writes[NewPricerSubscribe]          = new Writes[NewPricerSubscribe] {
@@ -104,5 +105,4 @@ private[newpricer] trait NewPricerJsonParser {
       "DateDeNaissance" -> beneficiary.date_of_birth.toString
     )
   }
-
 }
