@@ -7,15 +7,15 @@ private[newpricer] sealed trait Deductible extends Product with Serializable wit
 
 private[newpricer] object Deductible extends EnumHelper[Deductible] {
 
-  final case object BASE_DEDUCTIBLE               extends Deductible { override def label(): String = "Franchise de Base" }
+  final case object BASE_DEDUCTIBLE               extends Deductible { val label: String = "Franchise de Base" }
   final case object INCREASE_IN_DEDUCTIBLE        extends Deductible {
-    override def label(): String = "Augmentation de la franchise"
+    val label: String = "Augmentation de la franchise"
   }
   final case object DOUBLING_THE_DEDUCTIBLE       extends Deductible {
-    override def label(): String = "Doublement de la franchise"
+    val label: String = "Doublement de la franchise"
   }
   final case object PARTIAL_DEDUCTIBLE_REDEMPTION extends Deductible {
-    override def label(): String = "Rachat de franchise partiel"
+    val label: String = "Rachat de franchise partiel"
   }
 
   override val values: Set[Deductible] =

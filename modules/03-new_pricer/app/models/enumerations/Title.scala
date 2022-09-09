@@ -7,8 +7,8 @@ private[newpricer] sealed trait Title extends Product with Serializable with Enu
 
 private[newpricer] object Title extends EnumHelper[Title] {
 
-  final case object MRS extends Title { override def label(): String = "MME" }
-  final case object MR  extends Title { override def label(): String = "M."  }
+  final case object MRS extends Title { val label: String = "MME" }
+  final case object MR  extends Title { val label: String = "M."  }
 
   override val values: Set[Title] = Set(MRS, MR)
 

@@ -7,8 +7,8 @@ private[newpricer] sealed trait SplitPayment extends Product with Serializable w
 
 private[newpricer] object SplitPayment extends EnumHelper[SplitPayment] {
 
-  final case object M extends SplitPayment { override def label(): String = "M" }
-  final case object A extends SplitPayment { override def label(): String = "A" }
+  final case object M extends SplitPayment { val label: String = "M" }
+  final case object A extends SplitPayment { val label: String = "A" }
 
   override val values: Set[SplitPayment] = Set(M, A)
 

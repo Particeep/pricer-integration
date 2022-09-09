@@ -7,9 +7,9 @@ private[newpricer] sealed trait NomadicBusinessOption extends Product with Seria
 
 private[newpricer] object NomadicBusinessOption extends EnumHelper[NomadicBusinessOption] {
 
-  final case object NO         extends NomadicBusinessOption { override def label(): String = "Non"        }
-  final case object INDIVIDUAL extends NomadicBusinessOption { override def label(): String = "Individuel" }
-  final case object FAMILY     extends NomadicBusinessOption { override def label(): String = "Famille"    }
+  final case object NO         extends NomadicBusinessOption { val label: String = "Non"        }
+  final case object INDIVIDUAL extends NomadicBusinessOption { val label: String = "Individuel" }
+  final case object FAMILY     extends NomadicBusinessOption { val label: String = "Famille"    }
 
   override val values: Set[NomadicBusinessOption] = Set(NO, INDIVIDUAL, FAMILY)
 

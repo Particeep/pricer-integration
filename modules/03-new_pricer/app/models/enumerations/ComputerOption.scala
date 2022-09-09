@@ -7,9 +7,9 @@ private[newpricer] sealed trait ComputerOption extends Product with Serializable
 
 private[newpricer] object ComputerOption extends EnumHelper[ComputerOption] {
 
-  final case object YES       extends ComputerOption { override def label(): String = "Oui"       }
-  final case object NO        extends ComputerOption { override def label(): String = "Non"       }
-  final case object INCLUSION extends ComputerOption { override def label(): String = "Inclusion" }
+  final case object YES       extends ComputerOption { val label: String = "Oui"       }
+  final case object NO        extends ComputerOption { val label: String = "Non"       }
+  final case object INCLUSION extends ComputerOption { val label: String = "Inclusion" }
 
   override val values: Set[ComputerOption] = Set(YES, NO, INCLUSION)
 

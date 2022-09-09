@@ -6,13 +6,13 @@ import play.api.libs.json.{ JsString, JsValue, Writes }
 private[newpricer] sealed trait CommercialLatitudeRequested extends Product with Serializable with Enum
 
 private[newpricer] object CommercialLatitudeRequested extends EnumHelper[CommercialLatitudeRequested] {
-  final case object `-15%` extends CommercialLatitudeRequested { override def label(): String = "-15%" }
-  final case object `-10%` extends CommercialLatitudeRequested { override def label(): String = "-10%" }
-  final case object `-5%`  extends CommercialLatitudeRequested { override def label(): String = "-5%"  }
-  final case object `0%`   extends CommercialLatitudeRequested { override def label(): String = "0%"   }
-  final case object `5%`   extends CommercialLatitudeRequested { override def label(): String = "5%"   }
-  final case object `10%`  extends CommercialLatitudeRequested { override def label(): String = "10%"  }
-  final case object `15%`  extends CommercialLatitudeRequested { override def label(): String = "15%"  }
+  final case object `-15%` extends CommercialLatitudeRequested { val label: String = "-15%" }
+  final case object `-10%` extends CommercialLatitudeRequested { val label: String = "-10%" }
+  final case object `-5%`  extends CommercialLatitudeRequested { val label: String = "-5%"  }
+  final case object `0%`   extends CommercialLatitudeRequested { val label: String = "0%"   }
+  final case object `5%`   extends CommercialLatitudeRequested { val label: String = "5%"   }
+  final case object `10%`  extends CommercialLatitudeRequested { val label: String = "10%"  }
+  final case object `15%`  extends CommercialLatitudeRequested { val label: String = "15%"  }
 
   override val values: Set[CommercialLatitudeRequested] =
     Set(`-15%`, `-10%`, `-5%`, `0%`, `5%`, `10%`, `15%`)

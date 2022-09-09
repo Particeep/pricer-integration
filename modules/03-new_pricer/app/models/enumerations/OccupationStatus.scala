@@ -7,8 +7,8 @@ private[newpricer] sealed trait OccupationStatus extends Product with Serializab
 
 private[newpricer] object OccupationStatus extends EnumHelper[OccupationStatus] {
 
-  final case object TENANT         extends OccupationStatus { override def label(): String = "Locataire"             }
-  final case object OCCUPANT_OWNER extends OccupationStatus { override def label(): String = "Propriétaire occupant" }
+  final case object TENANT         extends OccupationStatus { val label: String = "Locataire"             }
+  final case object OCCUPANT_OWNER extends OccupationStatus { val label: String = "Propriétaire occupant" }
 
   override val values: Set[OccupationStatus] = Set(TENANT, OCCUPANT_OWNER)
 

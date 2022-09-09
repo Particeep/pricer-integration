@@ -488,11 +488,10 @@ class NewPricerServiceTest
       val new_pricer_service: NewPricerService =
         new NewPricerService(ws = ws, config = configuration)
       val response: Fail \/ PricerResponse     = await(new_pricer_service.quote(new_quote, new_pricer_quote_config))
+      val expected_error_message = s"Error from wakam api with status: 400 and body: $get_price_api_bad_request__response"
       response.fold(
         fail => {
-          fail.message must include(
-            "Les paramétres transmis ne permettent pas d'établir un tarif. Vérifier les modalités transmises."
-          )
+          fail.message mustBe expected_error_message
         },
         result => fail(s"unexpected response: $result")
       )
@@ -504,9 +503,10 @@ class NewPricerServiceTest
       val new_pricer_service: NewPricerService =
         new NewPricerService(ws = ws, config = configuration)
       val response: Fail \/ PricerResponse     = await(new_pricer_service.quote(new_quote, new_pricer_quote_config))
+      val expected_error_message = s"Unexpected Error with status: 422 and body: $unexpected_error_response"
       response.fold(
         fail => {
-          fail.message must include("Unprocessable entity")
+          fail.message mustBe expected_error_message
         },
         result => fail(s"unexpected response: $result")
       )
@@ -527,7 +527,8 @@ class NewPricerServiceTest
       val new_pricer_service: NewPricerService = new NewPricerService(ws = ws, config = config)
       val parse_response                       = PrivateMethod[-\/[Fail]](Symbol("check_response_status"))
       val error                                = new_pricer_service invokePrivate parse_response(400, get_price_api_bad_request__response)
-      error.a.message must include(get_price_api_bad_request__response.toString())
+      val expected_error_message = s"Error from wakam api with status: 400 and body: $get_price_api_bad_request__response"
+      error.a.message mustBe expected_error_message
     }
 
     "return unauthorized error with 401 status code " in {
@@ -535,8 +536,9 @@ class NewPricerServiceTest
       val config                               = mock[Configuration]
       val new_pricer_service: NewPricerService = new NewPricerService(ws = ws, config = config)
       val parse_response                       = PrivateMethod[-\/[Fail]](Symbol("check_response_status"))
-      val error                                = new_pricer_service invokePrivate parse_response(400, unauthorized_response)
-      error.a.message must include(unauthorized_response.toString())
+      val error                                = new_pricer_service invokePrivate parse_response(401, unauthorized_response)
+      val expected_error_message = s"Error from wakam api with status: 401 and body: $unauthorized_response"
+      error.a.message mustBe expected_error_message
     }
 
     "return unexpected error response" in {
@@ -545,7 +547,8 @@ class NewPricerServiceTest
       val new_pricer_service: NewPricerService = new NewPricerService(ws = ws, config = config)
       val parse_response                       = PrivateMethod[-\/[Fail]](Symbol("check_response_status"))
       val error                                = new_pricer_service invokePrivate parse_response(422, unexpected_error_response)
-      error.a.message must include(unexpected_error_response.toString())
+      val expected_error_message = s"Unexpected Error with status: 422 and body: $unexpected_error_response"
+      error.a.message mustBe expected_error_message
     }
 
     //   Test ignored due to invalid api authorization key
@@ -568,8 +571,9 @@ class NewPricerServiceTest
       val new_pricer_service: NewPricerService =
         new NewPricerService(ws = ws, config = configuration)
       val response                             = await(new_pricer_service.select(new_selection, new_pricer_select_config, selected_quote))
+      val expected_error_message = "Unprocessable entity"
       response.fold(
-        fail => fail.message contains "Unprocessable entity",
+        fail => fail.message must include(expected_error_message),
         result => fail(s"unexpected response: $result")
       )
 
