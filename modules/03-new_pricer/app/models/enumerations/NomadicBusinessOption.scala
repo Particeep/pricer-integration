@@ -1,0 +1,19 @@
+package newpricer.models.enumerations
+
+import helpers.{ Enum, EnumHelper }
+import play.api.libs.json.{ JsString, JsValue, Writes }
+
+private[newpricer] sealed trait NomadicBusinessOption extends Product with Serializable with Enum
+
+private[newpricer] object NomadicBusinessOption extends EnumHelper[NomadicBusinessOption] {
+
+  final case object NO         extends NomadicBusinessOption { val label: String = "Non"        }
+  final case object INDIVIDUAL extends NomadicBusinessOption { val label: String = "Individuel" }
+  final case object FAMILY     extends NomadicBusinessOption { val label: String = "Famille"    }
+
+  override val values: Set[NomadicBusinessOption] = Set(NO, INDIVIDUAL, FAMILY)
+
+  override implicit def enumWrites: Writes[NomadicBusinessOption] = new Writes[NomadicBusinessOption] {
+    def writes(v: NomadicBusinessOption): JsValue = JsString(v.label())
+  }
+}

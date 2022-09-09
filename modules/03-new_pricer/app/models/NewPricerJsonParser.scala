@@ -2,11 +2,108 @@ package newpricer.models
 
 import ai.x.play.json.Encoders.encoder
 import ai.x.play.json.Jsonx
-import play.api.libs.json.OFormat
+import play.api.libs.json.{ JsValue, Json, OFormat, Reads, Writes }
 
 private[newpricer] trait NewPricerJsonParser {
-  implicit val config_format: OFormat[NewPricerConfig]       = Jsonx.formatCaseClassUseDefaults[NewPricerConfig]
-  implicit val req_q_format: OFormat[NewPricerQuoteRequest]  = Jsonx.formatCaseClassUseDefaults[NewPricerQuoteRequest]
-  implicit val req_s_format: OFormat[NewPricerSelectRequest] = Jsonx.formatCaseClassUseDefaults[NewPricerSelectRequest]
-
+  implicit val new_pricer_quote_config_format: OFormat[NewPricerQuoteConfig]   =
+    Jsonx.formatCaseClassUseDefaults[NewPricerQuoteConfig]
+  implicit val new_pricer_quote_write: Writes[NewPricerQuote]                  = new Writes[NewPricerQuote] {
+    override def writes(new_pricer_quote: NewPricerQuote): JsValue = Json.obj(
+      "CodePostal"                          -> new_pricer_quote.postal_code,
+      "Commune"                             -> new_pricer_quote.municipality,
+      "Nature"                              -> new_pricer_quote.nature,
+      "StatutOccupation"                    -> new_pricer_quote.occupation_status.label(),
+      "TypeDeResidence"                     -> new_pricer_quote.type_of_residence,
+      "NombreDePieces"                      -> new_pricer_quote.number_of_rooms,
+      "Etage"                               -> new_pricer_quote.stage.label(),
+      "Surface"                             -> new_pricer_quote.surface.toString,
+      "CapitalMobilier"                     -> new_pricer_quote.movable_capital.toString,
+      "CapitalObjetsdeValeur"               -> new_pricer_quote.capital_valuables.toString,
+      "Franchise"                           -> new_pricer_quote.deductible.label(),
+      "OptionAffairesNomades"               -> new_pricer_quote.nomadic_business_option.label(),
+      "OptionSmartphone"                    -> NewPricerQuote.convert_boolean_to_yes_no(new_pricer_quote.smartphone_option),
+      "OptionOrdinateur"                    -> new_pricer_quote.computer_option.label(),
+      "OptionDommagesElectriques"           -> NewPricerQuote.convert_boolean_to_yes_no(
+        new_pricer_quote.electrical_damage_option
+      ),
+      "OptionBrisDeGlace"                   -> NewPricerQuote.convert_boolean_to_yes_no(new_pricer_quote.ice_breaker_option),
+      "OptionRCAssistanceMaternelle"        -> NewPricerQuote.convert_boolean_to_yes_no(
+        new_pricer_quote.nursery_assistant_rc_option
+      ),
+      "OptionRCAnimal"                      -> NewPricerQuote.convert_boolean_to_yes_no(new_pricer_quote.animal_rc_option),
+      "OptionRCLocationDeSalle"             -> NewPricerQuote.convert_boolean_to_yes_no(new_pricer_quote.room_rental_rc_option),
+      "OptionRCLocationSaisonniere"         -> NewPricerQuote.convert_boolean_to_yes_no(
+        new_pricer_quote.seasonal_rental_rc_option
+      ),
+      "OptionRCProfessionnelle"             -> NewPricerQuote.convert_boolean_to_yes_no(new_pricer_quote.professional_rc_option),
+      "OptionRCMoyenDeplacementNonMotorise" -> NewPricerQuote.convert_boolean_to_yes_no(
+        new_pricer_quote.non_motorized_travel_rc_option
+      ),
+      "OptionDommagesMaterielsPro"          -> NewPricerQuote.convert_boolean_to_yes_no(new_pricer_quote.property_damage_option),
+      "OptionCapitalCoupsdursphysiques"     -> NewPricerQuote.convert_boolean_to_yes_no(
+        new_pricer_quote.physical_hard_knocks_capital_option
+      ),
+      "OptionProtectionJuridique"           -> NewPricerQuote.convert_boolean_to_yes_no(new_pricer_quote.legal_protection_option),
+      "OptionDommagesHoteSharing"           -> NewPricerQuote.convert_boolean_to_yes_no(
+        new_pricer_quote.hotel_sharing_damage_option
+      ),
+      "OptionRCLocatairePNO"                -> NewPricerQuote.convert_boolean_to_yes_no(new_pricer_quote.tenant_pno_rc_option),
+      "OptionRemplacementANeufMobilier"     -> NewPricerQuote.convert_boolean_to_yes_no(
+        new_pricer_quote.new_furniture_replacement_option
+      ),
+      "OptionAssuranceScolaire"             -> NewPricerQuote.convert_boolean_to_yes_no(new_pricer_quote.school_insurance_option),
+      "OptionCaveAVin"                      -> NewPricerQuote.convert_boolean_to_yes_no(new_pricer_quote.wine_cellar_option),
+      "Dependance"                          -> NewPricerQuote.convert_boolean_to_yes_no(new_pricer_quote.dependence),
+      "LatitudeCommercialeDemandee"         -> new_pricer_quote.commercial_latitude_requested.label()
+    )
+  }
+  implicit val new_pricer_quote_format: OFormat[NewPricerQuote]                = Jsonx.formatCaseClass[NewPricerQuote]
+  implicit val warranty_format: OFormat[Warranty]                              = Json.format[Warranty]
+  implicit val success_case_format: OFormat[NewPricerQuoteResponse]            = Json.format[NewPricerQuoteResponse]
+  implicit val new_pricer_select_config_format: OFormat[NewPricerSelectConfig] = Json.format[NewPricerSelectConfig]
+  implicit val new_pricer_subscribe_write: Writes[NewPricerSubscribe]          = new Writes[NewPricerSubscribe] {
+    override def writes(new_pricer_subscribe: NewPricerSubscribe): JsValue = Json.obj(
+      "QuoteReference"                   -> new_pricer_subscribe.quote_reference,
+      "ReferenceClient"                  -> new_pricer_subscribe.reference_client,
+      "DateDebutEffet"                   -> new_pricer_subscribe.start_date_effect,
+      "DateFinEffet"                     -> new_pricer_subscribe.end_date_effect,
+      "Fractionnement"                   -> new_pricer_subscribe.split_payment.label(),
+      "DatePremiereEcheance"             -> new_pricer_subscribe.first_due_date,
+      "Nom"                              -> new_pricer_subscribe.last_name,
+      "Prenom"                           -> new_pricer_subscribe.first_name,
+      "Titre"                            -> new_pricer_subscribe.title.label(),
+      "Email"                            -> new_pricer_subscribe.email,
+      "Iban"                             -> new_pricer_subscribe.iban,
+      "Bic"                              -> new_pricer_subscribe.bic,
+      "CodeBanque"                       -> new_pricer_subscribe.bank_code,
+      "NomBanque"                        -> new_pricer_subscribe.bank_name,
+      "Titulaire"                        -> new_pricer_subscribe.holder,
+      "NumeroMobile"                     -> new_pricer_subscribe.mobile_number,
+      "Adresse"                          -> new_pricer_subscribe.address,
+      "Commune"                          -> new_pricer_subscribe.municipality,
+      "CodePostal"                       -> new_pricer_subscribe.postal_code,
+      "Beneficiaires"                    -> Json.toJson(new_pricer_subscribe.beneficiaries),
+      "DateDeNaissance"                  -> new_pricer_subscribe.date_of_birth,
+      "LieuDit"                          -> new_pricer_subscribe.said_place,
+      "NomVoie"                          -> new_pricer_subscribe.channel_name,
+      "NumeroVoie"                       -> new_pricer_subscribe.channel_number,
+      "Qualite"                          -> new_pricer_subscribe.quality.label(),
+      "NumeroPaiement"                   -> new_pricer_subscribe.payment_number,
+      "MontantPaiement"                  -> new_pricer_subscribe.payment_amount,
+      "AssureurPrecedent"                -> new_pricer_subscribe.previous_insurer,
+      "NumeroPolicePrecedent"            -> new_pricer_subscribe.previous_policy_number,
+      "DateSouscriptionPolicePrecedente" -> new_pricer_subscribe.previous_policy_subscription_date
+    )
+  }
+  implicit val new_pricer_subscribe_read: OFormat[NewPricerSubscribe]          = Jsonx.formatCaseClass[NewPricerSubscribe]
+  implicit val beneficiaries_read: Reads[Beneficiary]                          = Json.reads[Beneficiary]
+  implicit val beneficiaries_write: Writes[Beneficiary]                        = new Writes[Beneficiary] {
+    override def writes(beneficiary: Beneficiary): JsValue = Json.obj(
+      "Type"            -> beneficiary.kind,
+      "Titre"           -> beneficiary.title,
+      "Nom"             -> beneficiary.last_name,
+      "Prenom"          -> beneficiary.first_name,
+      "DateDeNaissance" -> beneficiary.date_of_birth.toString
+    )
+  }
 }
