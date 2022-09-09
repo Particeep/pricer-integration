@@ -24,9 +24,9 @@ private[newpricer] object InputFormatFactory {
       InputFormat(name = "type_of_residence", kind = TEXT, mandatory   = true),
       InputFormat(name = "number_of_rooms", kind   = NUMBER, mandatory = true),
       InputFormat(name = "stage", kind             = ENUM, mandatory   = true, options = Stage.values.map(_.toString).toList),
-      InputFormat(name = "surface", kind           = TEXT, mandatory   = true),
-      InputFormat(name = "movable_capital", kind   = TEXT, mandatory   = true),
-      InputFormat(name = "capital_valuables", kind = TEXT, mandatory   = true),
+      InputFormat(name = "surface", kind           = NUMBER, mandatory = true),
+      InputFormat(name = "movable_capital", kind   = NUMBER, mandatory = true),
+      InputFormat(name = "capital_valuables", kind = NUMBER, mandatory = true),
       InputFormat(
         name           = "deductible",
         kind           = ENUM,

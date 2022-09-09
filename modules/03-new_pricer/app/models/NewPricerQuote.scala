@@ -1,13 +1,6 @@
 package newpricer.models
 
-import newpricer.models.enumerations.{
-  CommercialLatitudeRequested,
-  ComputerOption,
-  Deductible,
-  NomadicBusinessOption,
-  OccupationStatus,
-  Stage
-}
+import newpricer.models.enumerations._
 
 private[newpricer] final case class NewPricerQuote(
   postal_code:                         String,
